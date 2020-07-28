@@ -6,7 +6,7 @@
 #include "Platformer/HealthComponent.h"
 #include "Engine.h"
 
-#define DEBUG
+//#define DEBUG
 
 // Sets default values
 AWaveManagerBase::AWaveManagerBase()
@@ -59,14 +59,15 @@ void AWaveManagerBase::Update()
 			for (int i = 0; i < ActorsToRemove.Num(); i++)
 			{
 				Solders.Remove(ActorsToRemove[i]);
-				if (AmountOfSpawned < TotalAmountToSpawn)
+				if (AmountOfSpawned + AmountToSpawn < TotalAmountToSpawn)
 				{
 #ifdef DEBUG
 					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attempring to spawn"));
 #endif // DEBUG				
 					if (SpawnNewSolder())
 					{
-						AmountOfSpawned++;
+						if (AmountToSpawn < 0) { AmountToSpawn = 0; }
+						AmountToSpawn++;
 
 #ifdef DEBUG
 						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawn Successed"));
@@ -81,11 +82,12 @@ void AWaveManagerBase::Update()
 				}
 			}
 
-			if (Solders.Num() > 0 || AmountOfSpawned == TotalAmountToSpawn) { return; }
+			if (Solders.Num() > 0 || AmountToSpawn > 0) { return; }
 
 		}
-		if (WaveId != -1)
+		if (WaveId != -1 && AmountToSpawn <= 0 && AmountOfSpawned == TotalAmountToSpawn)
 		{
+
 			OnWaveEnded.Broadcast(WaveId);
 			UpdateTimerHanlde.Invalidate();
 			ProccessEndOfWave();
@@ -103,11 +105,11 @@ void AWaveManagerBase::StartNewWave()
 	}
 }
 
-bool AWaveManagerBase::ShouldSpawn(TArray<int> Indicies,int TotalCount,int& TotalCountRes,int&arrayId)
+bool AWaveManagerBase::ShouldSpawn(TArray<int> Indicies,int& TotalCount,int&arrayId)
 {
 	if (Indicies.Num() > 0)
 	{
-		
+		TotalCount = 0;
 		for (int i = 0; i < Indicies.Num(); i++)
 		{
 			for (int u = 0; u < Indicies[i]; u++)
@@ -115,13 +117,21 @@ bool AWaveManagerBase::ShouldSpawn(TArray<int> Indicies,int TotalCount,int& Tota
 				TotalCount++;
 				if (TotalCount == AmountOfSpawned + 1) 
 				{
+#ifdef DEBUG
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("New AI can be spawned!"));
+#endif // DEBUG	
 					arrayId = i;
-					TotalCountRes = AmountOfSpawned + 1;
+					
 					return true;
 				}
 			}
 		}
 	}
+#ifdef DEBUG
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("New AI can NOT be spawned!"));
+#endif // DEBUG	
+
+	arrayId = -1;
 	return false;
 }
 
@@ -130,5 +140,12 @@ void AWaveManagerBase::StartWave(int NewWaveId)
 	SpawnNewWaveActors(NewWaveId);
 	GetWorld()->GetTimerManager().SetTimer(UpdateTimerHanlde, this, &AWaveManagerBase::Update, 0.1f, true);
 	WaveIsDone = false;
+}
+
+void AWaveManagerBase::StartSpawnTimer(TSubclassOf<AActor> HumanClass, float time)
+{
+	FTimerDelegate SpawnDelegate = FTimerDelegate::CreateUObject(this, &AWaveManagerBase::SpawnHuman, HumanClass);
+	FTimerHandle handle = FTimerHandle();
+	GetWorldTimerManager().SetTimer(handle, SpawnDelegate, time,false);
 }
 
