@@ -103,11 +103,11 @@ void AWaveManagerBase::StartNewWave()
 	}
 }
 
-bool AWaveManagerBase::ShouldSpawn(TArray<int> Indicies,int TotalCount,int& TotalCountRes,int&arrayId)
+bool AWaveManagerBase::ShouldSpawn(TArray<int> Indicies,int& TotalCount,int&arrayId)
 {
 	if (Indicies.Num() > 0)
 	{
-		
+		TotalCount = 0;
 		for (int i = 0; i < Indicies.Num(); i++)
 		{
 			for (int u = 0; u < Indicies[i]; u++)
@@ -115,13 +115,21 @@ bool AWaveManagerBase::ShouldSpawn(TArray<int> Indicies,int TotalCount,int& Tota
 				TotalCount++;
 				if (TotalCount == AmountOfSpawned + 1) 
 				{
+#ifdef DEBUG
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("New AI can be spawned!"));
+#endif // DEBUG	
 					arrayId = i;
-					TotalCountRes = AmountOfSpawned + 1;
+					
 					return true;
 				}
 			}
 		}
 	}
+#ifdef DEBUG
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("New AI can NOT be spawned!"));
+#endif // DEBUG	
+
+	arrayId = -1;
 	return false;
 }
 

@@ -54,7 +54,7 @@ public:
 		void StartNewWave();
 
 	UFUNCTION(BlueprintPure)
-		bool ShouldSpawn(TArray<int>Indicies, int TotalCount, int& TotalCountRes, int& arrayId);
+		bool ShouldSpawn(TArray<int> Indicies, int& TotalCount, int& arrayId);
 
 	UFUNCTION(BlueprintCallable)
 		void StartWave(int NewWaveId);
