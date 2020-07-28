@@ -21,6 +21,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	TArray<FTimerHandle>SpawnTimers;
 public:	
 
 	UPROPERTY(BlueprintAssignable)
@@ -42,6 +43,9 @@ public:
 		int AmountOfSpawned = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int AmountToSpawn = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int TotalAmountToSpawn = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -58,6 +62,15 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void StartWave(int NewWaveId);
+
+	UFUNCTION(BlueprintCallable)
+		void StartSpawnTimer(TSubclassOf<AActor>HumanClass, float time);
+
+	/*This function should not be called directly and exist only to help to connect c++ and bp code*/
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		void SpawnHuman(TSubclassOf<AActor>HumanClass);
+
+	void SpawnHuman_Implementation(TSubclassOf<AActor>HumanClass){}
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		void SpawnNewWaveActors(int NewWaveId);
