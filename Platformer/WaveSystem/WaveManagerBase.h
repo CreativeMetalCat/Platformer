@@ -33,6 +33,25 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool WaveIsDone = false;
 
+	/*How long did it take for player to complete this waves. Only counts actuall wave time*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float TakenTime = 0.f;
+
+	/*How long did it take player to die. Count all time*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float TotalTakenTime = 0.f;
+
+	/*How much people did player kill*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float TotalScore = 0.f;
+
+	/*How much people did player kill*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float Score = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool PlayerIsDead = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<AActor*>Solders;
 

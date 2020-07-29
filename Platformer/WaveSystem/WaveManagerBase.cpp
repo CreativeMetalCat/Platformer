@@ -4,6 +4,7 @@
 #include "WaveManagerBase.h"
 #include "Platformer/HumanInterface.h"
 #include "Platformer/HealthComponent.h"
+#include "Platformer/ScoreComponent.h"
 #include "Engine.h"
 
 //#define DEBUG
@@ -27,7 +28,14 @@ void AWaveManagerBase::BeginPlay()
 void AWaveManagerBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	if (!PlayerIsDead)
+	{
+		if (!WaveIsDone)
+		{
+			TakenTime += DeltaTime;
+		}
+		TotalTakenTime += DeltaTime;
+	}
 }
 
 void AWaveManagerBase::Update()
@@ -58,6 +66,13 @@ void AWaveManagerBase::Update()
 			}
 			for (int i = 0; i < ActorsToRemove.Num(); i++)
 			{
+				auto ScoreComp = ActorsToRemove[i]->GetComponentByClass(UScoreComponent::StaticClass());
+				if (ScoreComp != nullptr)
+				{
+					int temp = Cast<UScoreComponent>(ScoreComp)->Score;
+					Score += temp;
+					TotalScore += temp;
+				}
 				Solders.Remove(ActorsToRemove[i]);
 				if (AmountOfSpawned + AmountToSpawn < TotalAmountToSpawn)
 				{
@@ -92,6 +107,10 @@ void AWaveManagerBase::Update()
 			UpdateTimerHanlde.Invalidate();
 			ProccessEndOfWave();
 			WaveIsDone = true;
+			AmountOfSpawned = 0;
+			TotalAmountToSpawn = 0;
+			Score = 0;
+			TakenTime = 0;
 		}
 	}
 }
