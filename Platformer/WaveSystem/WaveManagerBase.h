@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Platformer/Gamemodes/Gamemodes.h"
 #include "GameFramework/Actor.h"
 #include "WaveManagerBase.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWaveEnded, int, WaveId);
+
 
 UCLASS()
 class PLATFORMER_API AWaveManagerBase : public AActor
@@ -22,6 +24,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	TArray<FTimerHandle>SpawnTimers;
+
+	FTimerHandle NextWaveTimer;
 public:	
 
 	UPROPERTY(BlueprintAssignable)
@@ -33,9 +37,24 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool WaveIsDone = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = true))
+		EGameModes Gamemode = EGameModes::EGM_Defaut;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = true))
+		EDifficultyLevel DifficultyLevel = EDifficultyLevel::EDL_Normal;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = true), Category = Endless)
+		TArray<TSubclassOf<AActor>>AllowedSpawnClasses;
+
 	/*How long did it take for player to complete this waves. Only counts actuall wave time*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float TakenTime = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bAutoNextWave = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float TimeBetweenWaves = 20.f;
 
 	/*How long did it take player to die. Count all time*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -44,6 +63,9 @@ public:
 	/*How much people did player kill*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float TotalScore = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int MaxEnemiesAtOnce = 3;
 
 	/*How much people did player kill*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -90,6 +112,11 @@ public:
 		void SpawnHuman(TSubclassOf<AActor>HumanClass);
 
 	void SpawnHuman_Implementation(TSubclassOf<AActor>HumanClass){}
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		int GetTotalAmountOfAvailableWaves();
+
+	int GetTotalAmountOfAvailableWaves_Implementation() { return -1; }
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		void SpawnNewWaveActors(int NewWaveId);

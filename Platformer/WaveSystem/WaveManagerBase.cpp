@@ -42,6 +42,7 @@ void AWaveManagerBase::Update()
 {
 	if (!WaveIsDone)
 	{
+
 		if (Solders.Num() > 0)
 		{
 			TArray<AActor*>ActorsToRemove;
@@ -74,10 +75,13 @@ void AWaveManagerBase::Update()
 					TotalScore += temp;
 				}
 				Solders.Remove(ActorsToRemove[i]);
-				if (AmountOfSpawned + AmountToSpawn < TotalAmountToSpawn)
+#ifdef DEBUG
+				GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Emerald, TEXT("removing dead solder from list"));
+#endif // DEBUG	
+				if ((AmountOfSpawned + AmountToSpawn < TotalAmountToSpawn) || Gamemode == EGameModes::EGM_InfiniteEnemies)
 				{
 #ifdef DEBUG
-					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attempring to spawn"));
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attempting to spawn"));
 #endif // DEBUG				
 					if (SpawnNewSolder())
 					{
@@ -97,10 +101,13 @@ void AWaveManagerBase::Update()
 				}
 			}
 
-			if (Solders.Num() > 0 || AmountToSpawn > 0) { return; }
+			if (Gamemode != EGameModes::EGM_InfiniteEnemies)
+			{
+				if (Solders.Num() > 0 || AmountToSpawn > 0) { return; }
+			}
 
 		}
-		if (WaveId != -1 && AmountToSpawn <= 0 && AmountOfSpawned == TotalAmountToSpawn)
+		if (WaveId != -1 && AmountToSpawn <= 0 && AmountOfSpawned == TotalAmountToSpawn&& Gamemode != EGameModes::EGM_InfiniteEnemies)
 		{
 
 			OnWaveEnded.Broadcast(WaveId);
@@ -111,16 +118,37 @@ void AWaveManagerBase::Update()
 			TotalAmountToSpawn = 0;
 			Score = 0;
 			TakenTime = 0;
+
+			if (bAutoNextWave) 
+			{
+				//so that we don't need to manually add this to each world, but still leave possibility for scripted events
+				GetWorldTimerManager().SetTimer(NextWaveTimer, this, &AWaveManagerBase::StartNewWave, TimeBetweenWaves, false);
+			}
 		}
 	}
 }
 
 void AWaveManagerBase::StartNewWave()
 {
-	if (WaveIdIsValid(WaveId + 1))
+	if (Gamemode == EGameModes::EGM_Defaut || Gamemode == ::EGameModes::EGM_Money)
 	{
-		StartWave(WaveId + 1);
-		WaveId++;
+		if (WaveIdIsValid(WaveId + 1))
+		{
+			StartWave(WaveId + 1);
+			WaveId++;
+		}
+	}
+	else if (GetTotalAmountOfAvailableWaves() > 0 && Gamemode == EGameModes::EGM_InfiniteWaves)
+	{
+		int id = FMath::RandRange(0, GetTotalAmountOfAvailableWaves() - 1);
+		if (WaveIdIsValid(id))
+		{
+			StartWave(id);
+		}
+	}
+	else if (Gamemode == EGameModes::EGM_InfiniteEnemies)
+	{
+		StartWave(0);
 	}
 }
 
