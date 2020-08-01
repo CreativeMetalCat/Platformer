@@ -32,6 +32,18 @@ void APhysicsHumanBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 }
 
+bool APhysicsHumanBase::GetIsBoneOnTheHead(FName BoneName)
+{
+	if (HeadBones.Num() > 0) 
+	{
+		for (int i = 0; i < HeadBones.Num(); i++)
+		{
+			if (HeadBones[i] == BoneName) { return true; }
+		}
+	}
+	return false;
+}
+
 bool APhysicsHumanBase::CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation, int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor) const
 {
 

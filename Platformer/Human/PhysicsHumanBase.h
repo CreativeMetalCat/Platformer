@@ -28,6 +28,12 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Bones)
+		TArray<FName>HeadBones;
+
+	UFUNCTION(BlueprintPure)
+		bool GetIsBoneOnTheHead(FName BoneName);
+
 	/*Mesh that is used to check if player is visible*/
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = AIVisibility)
 		/*Mesh that is used to check if player is visible*/
