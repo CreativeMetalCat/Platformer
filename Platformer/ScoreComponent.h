@@ -24,7 +24,12 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	/*Score given for killing*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int Score = 10;
+
+	/*How much money will be dropped*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int Money = 100;
 		
 };
