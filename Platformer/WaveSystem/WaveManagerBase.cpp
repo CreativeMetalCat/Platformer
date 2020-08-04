@@ -71,10 +71,16 @@ void AWaveManagerBase::Update()
 				if (ScoreComp != nullptr)
 				{
 					int temp = Cast<UScoreComponent>(ScoreComp)->Score;
+					if (Cast<UScoreComponent>(ScoreComp)->bWasKilledInTheHead)
+					{
+						AmountOfHeadShots++;
+					}
 					Score += temp;
 					TotalScore += temp;
 				}
 				Solders.Remove(ActorsToRemove[i]);
+				AmountOfDeadSolders++;
+				
 #ifdef DEBUG
 				GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Emerald, TEXT("removing dead solder from list"));
 #endif // DEBUG	
@@ -118,6 +124,7 @@ void AWaveManagerBase::Update()
 			TotalAmountToSpawn = 0;
 			Score = 0;
 			TakenTime = 0;
+			AmountOfDeadSolders = 0;
 
 			if (bAutoNextWave) 
 			{
@@ -180,6 +187,11 @@ bool AWaveManagerBase::ShouldSpawn(TArray<int> Indicies,int& TotalCount,int&arra
 
 	arrayId = -1;
 	return false;
+}
+
+int AWaveManagerBase::GetHowManySoldersIsLeft()
+{
+	return TotalAmountToSpawn - AmountOfDeadSolders;
 }
 
 void AWaveManagerBase::StartWave(int NewWaveId)

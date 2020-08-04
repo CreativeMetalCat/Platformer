@@ -90,6 +90,12 @@ public:
 		int TotalAmountToSpawn = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int AmountOfDeadSolders = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int AmountOfHeadShots = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int WaveId = -1;
 
 	UFUNCTION(BlueprintCallable)
@@ -100,6 +106,9 @@ public:
 
 	UFUNCTION(BlueprintPure)
 		bool ShouldSpawn(TArray<int> Indicies, int& TotalCount, int& arrayId);
+
+	UFUNCTION(BlueprintPure)
+		int GetHowManySoldersIsLeft();
 
 	UFUNCTION(BlueprintCallable)
 		void StartWave(int NewWaveId);

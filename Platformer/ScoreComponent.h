@@ -28,6 +28,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int Score = 10;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bWasKilledInTheHead = false;
+
 	/*How much money will be dropped*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int Money = 100;
