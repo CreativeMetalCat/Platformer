@@ -47,12 +47,14 @@ bool ASolderAiBase::UpdateAI(TArray<AActor*> VisibleActors)
 							CurrentEnemy = VisibleActors[i];
 							GetBlackboardComponent()->SetValueAsObject(TargetFieldName, VisibleActors[i]);
 							OnTargetFound();
+							GetWorldTimerManager().PauseTimer(NewWanderPointSelectionTimer);
 							return true;
 						}
 					}
 				}
 			}
 			if(bHadEnemy){ OnEnemyLost(); }
+			GetWorldTimerManager().UnPauseTimer(NewWanderPointSelectionTimer);
 			return false;
 		}
 		else
@@ -84,6 +86,12 @@ void ASolderAiBase::RemoveTarget()
 	CurrentEnemy = nullptr;
 	GetBlackboardComponent()->ClearValue(TargetFieldName);
 	SetFocus(nullptr);
+	GetWorldTimerManager().UnPauseTimer(NewWanderPointSelectionTimer);
+}
+
+void ASolderAiBase::ResetGiveUpTimer()
+{
+	GetWorldTimerManager().SetTimer(NewWanderPointSelectionTimer, this, &ASolderAiBase::SelectNewWanderPoint, TimeBeforeGivingUpOnPoint);
 }
 
 FVector ASolderAiBase::GetClosestPointToLastLocation(bool& Found)
