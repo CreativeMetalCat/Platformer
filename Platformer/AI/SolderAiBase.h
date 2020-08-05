@@ -15,8 +15,16 @@ UCLASS()
 class PLATFORMER_API ASolderAiBase : public AAIController
 {
 	GENERATED_BODY()
-	
+
+protected:
+		/*this timer is paused when ai sees enemy*/
+		FTimerHandle NewWanderPointSelectionTimer;
 public:
+
+	/*IF ai can not reach WanderPoint in 20 this time new point will be selected*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Wandering)
+		float TimeBeforeGivingUpOnPoint = 20.f;
+
 	/*Default enemy class. Ususally Player class*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category = Enemy)
 		TSubclassOf<APhysicsHumanBase> EnemyClass;
@@ -56,6 +64,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void RemoveTarget();
 
+	UFUNCTION(BlueprintCallable)
+		void ResetGiveUpTimer();
+
 	UFUNCTION(BlueprintPure)
 		FVector GetClosestPointToLastLocation(bool& Found);
 
@@ -64,6 +75,11 @@ public:
 		void OnEnemyLost();
 
 	virtual void OnEnemyLost_Implementation() {}
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void SelectNewWanderPoint();
+
+	virtual void SelectNewWanderPoint_Implementation() {}
 
 	/*Called when new target is found*/
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
