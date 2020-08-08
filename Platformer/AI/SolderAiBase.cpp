@@ -8,65 +8,78 @@
 
 bool ASolderAiBase::UpdateAI(TArray<AActor*> VisibleActors)
 {
-	if (VisibleActors.Num() > 0)
+	if (!bCanAlwaysSeeEnemy)
 	{
-		bool bEnemyCanBeSeen = false;
-		bool bHadEnemy = false;
-		if (CurrentEnemy != nullptr)
+		if (VisibleActors.Num() > 0)
 		{
-			bHadEnemy = true;
-			bool bAlive = false;
-			auto HealthComp = CurrentEnemy->GetComponentByClass(UHealthComponent::StaticClass());
-			if (HealthComp != nullptr)
+			bool bEnemyCanBeSeen = false;
+			bool bHadEnemy = false;
+			if (CurrentEnemy != nullptr)
 			{
-				bAlive = !Cast<UHealthComponent>(HealthComp)->Dead;
-			}
-			if (VisibleActors.Find(CurrentEnemy) != -1 && bAlive)
-			{
-				bEnemyCanBeSeen = true;			
-				LastSeenLocation = CurrentEnemy->GetActorLocation();
-				return true;
-			}
-			else
-			{
-				RemoveTarget();
-			}
-		}
-		if (!bEnemyCanBeSeen)
-		{
-			for (int i = 0; i < VisibleActors.Num(); i++)
-			{
-				if (VisibleActors[i]->GetClass()->IsChildOf(EnemyClass) || VisibleActors[i]->GetClass() == EnemyClass)
+				bHadEnemy = true;
+				bool bAlive = false;
+				auto HealthComp = CurrentEnemy->GetComponentByClass(UHealthComponent::StaticClass());
+				if (HealthComp != nullptr)
 				{
-					auto HealthComp = VisibleActors[i]->GetComponentByClass(UHealthComponent::StaticClass());
-					if (HealthComp != nullptr) 
+					bAlive = !Cast<UHealthComponent>(HealthComp)->Dead;
+				}
+				if (VisibleActors.Find(CurrentEnemy) != -1 && bAlive)
+				{
+					bEnemyCanBeSeen = true;
+					LastSeenLocation = CurrentEnemy->GetActorLocation();
+					return true;
+				}
+				else
+				{
+					RemoveTarget();
+				}
+			}
+			if (!bEnemyCanBeSeen)
+			{
+				for (int i = 0; i < VisibleActors.Num(); i++)
+				{
+					if (VisibleActors[i]->GetClass()->IsChildOf(EnemyClass) || VisibleActors[i]->GetClass() == EnemyClass)
 					{
-						if (!Cast<UHealthComponent>(HealthComp)->Dead)
+						auto HealthComp = VisibleActors[i]->GetComponentByClass(UHealthComponent::StaticClass());
+						if (HealthComp != nullptr)
 						{
-							SetFocus(VisibleActors[i]);
-							CurrentEnemy = VisibleActors[i];
-							GetBlackboardComponent()->SetValueAsObject(TargetFieldName, VisibleActors[i]);
-							OnTargetFound();
-							GetWorldTimerManager().PauseTimer(NewWanderPointSelectionTimer);
-							return true;
+							if (!Cast<UHealthComponent>(HealthComp)->Dead)
+							{
+								SetFocus(VisibleActors[i]);
+								CurrentEnemy = VisibleActors[i];
+								GetBlackboardComponent()->SetValueAsObject(TargetFieldName, VisibleActors[i]);
+								OnTargetFound();
+								GetWorldTimerManager().PauseTimer(NewWanderPointSelectionTimer);
+								return true;
+							}
 						}
 					}
 				}
+				if (bHadEnemy) { OnEnemyLost(); }
+				GetWorldTimerManager().UnPauseTimer(NewWanderPointSelectionTimer);
+				return false;
 			}
-			if(bHadEnemy){ OnEnemyLost(); }
-			GetWorldTimerManager().UnPauseTimer(NewWanderPointSelectionTimer);
-			return false;
+			else
+			{
+				return true;
+			}
 		}
 		else
 		{
-			return true;
+			RemoveTarget();
+			OnEnemyLost();
+			return false;
 		}
 	}
 	else
 	{
-		RemoveTarget();
-		OnEnemyLost();
-		return false;
+		FHitResult hit;
+		GetWorld()->LineTraceSingleByChannel(hit, GetPawn()->GetActorLocation(), CurrentEnemy->GetActorLocation(), ECollisionChannel::ECC_Destructible);
+		if (hit.bBlockingHit)
+		{
+			return hit.Actor == CurrentEnemy;
+		}
+		return true;
 	}
 }
 
@@ -87,6 +100,40 @@ void ASolderAiBase::RemoveTarget()
 	GetBlackboardComponent()->ClearValue(TargetFieldName);
 	SetFocus(nullptr);
 	GetWorldTimerManager().UnPauseTimer(NewWanderPointSelectionTimer);
+}
+
+void ASolderAiBase::ForceToSeeEnemy(AActor* enemy)
+{
+	CurrentEnemy = enemy;
+	bCanAlwaysSeeEnemy = true;
+	SetFocus(enemy);
+	GetBlackboardComponent()->SetValueAsObject(TargetFieldName, enemy);
+	OnTargetFound();
+	GetWorldTimerManager().PauseTimer(NewWanderPointSelectionTimer);
+}
+
+void ASolderAiBase::ReactToGunNoise(FVector Location, AActor* NoiseLocationActor)
+{
+	if (CurrentEnemy == nullptr)//we don't care about player shooting if we can see it
+	{
+		bool Found = false;
+		FVector Pos = GetClosestPointToLastLocation(Found);
+		LastSeenLocation = Found ? Pos : Location;
+		GetBlackboardComponent()->SetValueAsVector(LastSeenLocationFieldName, LastSeenLocation);
+		LastNoiseLocationActor = NoiseLocationActor;
+		SetFocus(LastNoiseLocationActor);
+		GetWorldTimerManager().SetTimer(StopLookingAtNoiseLocationTimerHandle, this, &ASolderAiBase::ForgetAboutNoise, 10.f);
+	}
+}
+
+void ASolderAiBase::ForgetAboutNoise()
+{
+	StopLookingAtNoiseLocationTimerHandle.Invalidate();
+	if (GetFocusActor() == LastNoiseLocationActor)
+	{
+		LastNoiseLocationActor = nullptr;
+		SetFocus(nullptr);
+	}
 }
 
 void ASolderAiBase::ResetGiveUpTimer()
