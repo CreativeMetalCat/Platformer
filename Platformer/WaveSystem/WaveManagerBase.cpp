@@ -5,6 +5,7 @@
 #include "Platformer/HumanInterface.h"
 #include "Platformer/HealthComponent.h"
 #include "Platformer/ScoreComponent.h"
+#include "Platformer/AI/SolderAiBase.h"
 #include "Engine.h"
 
 //#define DEBUG
@@ -79,6 +80,7 @@ void AWaveManagerBase::Update()
 					TotalScore += temp;
 				}
 				Solders.Remove(ActorsToRemove[i]);
+				OnEnemyDied();
 				AmountOfDeadSolders++;
 				
 #ifdef DEBUG
@@ -115,7 +117,10 @@ void AWaveManagerBase::Update()
 		}
 		if (WaveId != -1 && AmountToSpawn <= 0 && AmountOfSpawned == TotalAmountToSpawn&& Gamemode != EGameModes::EGM_InfiniteEnemies)
 		{
-
+			if (Gamemode != EGameModes::EGM_Defaut)
+			{
+				TotalWaveCount++;
+			}
 			OnWaveEnded.Broadcast(WaveId);
 			UpdateTimerHanlde.Invalidate();
 			ProccessEndOfWave();
@@ -125,6 +130,7 @@ void AWaveManagerBase::Update()
 			Score = 0;
 			TakenTime = 0;
 			AmountOfDeadSolders = 0;
+			TimeIsUpTimerHandle.Invalidate();
 
 			if (bAutoNextWave) 
 			{
@@ -135,9 +141,37 @@ void AWaveManagerBase::Update()
 	}
 }
 
+void AWaveManagerBase::OnTimeIsUp()
+{
+	if (Solders.Num() > 0 && GetPlayer() != nullptr)
+	{
+		BP_OnTimeIsUp();
+		for (int i = 0; i < Solders.Num(); i++)
+		{
+			if (Solders[i] != nullptr)
+			{
+				auto character = Cast<ACharacter>(Solders[i]);
+				if (character != nullptr)
+				{
+					auto ai = Cast<ASolderAiBase>(character->GetController());
+					if (ai != nullptr)
+					{
+						ai->ForceToSeeEnemy(GetPlayer());
+					}
+				}
+			}
+		}
+	}
+}
+
 void AWaveManagerBase::StartNewWave()
 {
-	if (Gamemode == EGameModes::EGM_Defaut || Gamemode == ::EGameModes::EGM_Money)
+	if (Gamemode == EGameModes::EGM_Money)
+	{
+		StartWave(WaveId + 1);
+		WaveId++;//it doesn't matter what wave id is used, because it will dynamicly generate wave loadout
+	}
+	else if (Gamemode == EGameModes::EGM_Defaut )
 	{
 		if (WaveIdIsValid(WaveId + 1))
 		{
@@ -197,7 +231,8 @@ int AWaveManagerBase::GetHowManySoldersIsLeft()
 void AWaveManagerBase::StartWave(int NewWaveId)
 {
 	SpawnNewWaveActors(NewWaveId);
-	GetWorld()->GetTimerManager().SetTimer(UpdateTimerHanlde, this, &AWaveManagerBase::Update, 0.1f, true);
+	GetWorldTimerManager().SetTimer(UpdateTimerHanlde, this, &AWaveManagerBase::Update, 0.1f, true);
+	GetWorldTimerManager().SetTimer(TimeIsUpTimerHandle, this, &AWaveManagerBase::OnTimeIsUp, TimeBeforeTimeIsUp, false);
 	WaveIsDone = false;
 }
 

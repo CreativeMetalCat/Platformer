@@ -19,6 +19,8 @@ class PLATFORMER_API ASolderAiBase : public AAIController
 protected:
 		/*this timer is paused when ai sees enemy*/
 		FTimerHandle NewWanderPointSelectionTimer;
+
+		FTimerHandle StopLookingAtNoiseLocationTimerHandle;
 public:
 
 	/*IF ai can not reach WanderPoint in 20 this time new point will be selected*/
@@ -28,6 +30,12 @@ public:
 	/*Default enemy class. Ususally Player class*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category = Enemy)
 		TSubclassOf<APhysicsHumanBase> EnemyClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enemy)
+		bool bCanAlwaysSeeEnemy = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Noise)
+		AActor* LastNoiseLocationActor = nullptr;
 
 	/*Class of actors that will be used to simplify movement to LastSeenLocation*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Lost)
@@ -63,6 +71,15 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void RemoveTarget();
+
+	UFUNCTION(BlueprintCallable)
+		void ForceToSeeEnemy(AActor* enemy);
+
+	UFUNCTION(BlueprintCallable)//NoiseLocationActor is ALastNoiseLocation
+		void ReactToGunNoise(FVector Location,AActor*NoiseLocationActor);
+
+	UFUNCTION(BlueprintCallable)
+		void ForgetAboutNoise();
 
 	UFUNCTION(BlueprintCallable)
 		void ResetGiveUpTimer();

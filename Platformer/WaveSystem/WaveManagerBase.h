@@ -25,8 +25,13 @@ protected:
 
 	TArray<FTimerHandle>SpawnTimers;
 
-	FTimerHandle NextWaveTimer;
 public:	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FTimerHandle NextWaveTimer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FTimerHandle TimeIsUpTimerHandle;
 
 	UPROPERTY(BlueprintAssignable)
 		FOnWaveEnded OnWaveEnded;
@@ -55,6 +60,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float TimeBetweenWaves = 20.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float TimeBeforeTimeIsUp = 60.f;
 
 	/*How long did it take player to die. Count all time*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -98,8 +106,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int WaveId = -1;
 
+	/*For the Endless modes*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int TotalWaveCount = 0 ;
+
 	UFUNCTION(BlueprintCallable)
 		void Update();
+
+	UFUNCTION(BlueprintCallable)
+		void OnTimeIsUp();
 
 	UFUNCTION(BlueprintCallable)
 		void StartNewWave();
@@ -116,11 +131,26 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void StartSpawnTimer(TSubclassOf<AActor>HumanClass, float time);
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		void OnEnemyDied();
+
+	void OnEnemyDied_Implementation(){}
+
 	/*This function should not be called directly and exist only to help to connect c++ and bp code*/
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		void SpawnHuman(TSubclassOf<AActor>HumanClass);
 
 	void SpawnHuman_Implementation(TSubclassOf<AActor>HumanClass){}
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		AActor* GetPlayer();
+
+	AActor* GetPlayer_Implementation() { return nullptr; }
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		void BP_OnTimeIsUp();
+
+	void BP_OnTimeIsUp_Implementation(){}
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		int GetTotalAmountOfAvailableWaves();
