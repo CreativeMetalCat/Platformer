@@ -6,7 +6,7 @@
 #include "Platformer/Human/PhysicsHumanBase.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "Components/BillboardComponent.h"
+
 #include "Platformer/AI/SolderAiBase.h"
 
 // Sets default values

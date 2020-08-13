@@ -73,13 +73,11 @@ bool ASolderAiBase::UpdateAI(TArray<AActor*> VisibleActors)
 	}
 	else
 	{
-		FHitResult hit;
-		GetWorld()->LineTraceSingleByChannel(hit, GetPawn()->GetActorLocation(), CurrentEnemy->GetActorLocation(), ECollisionChannel::ECC_Destructible);
-		if (hit.bBlockingHit)
+		if (VisibleActors.Num() > 0)
 		{
-			return hit.Actor == CurrentEnemy;
+			return (VisibleActors.Find(CurrentEnemy)!=-1);
 		}
-		return true;
+		return false;
 	}
 }
 
@@ -119,10 +117,16 @@ void ASolderAiBase::ReactToGunNoise(FVector Location, AActor* NoiseLocationActor
 		bool Found = false;
 		FVector Pos = GetClosestPointToLastLocation(Found);
 		LastSeenLocation = Found ? Pos : Location;
-		GetBlackboardComponent()->SetValueAsVector(LastSeenLocationFieldName, LastSeenLocation);
-		LastNoiseLocationActor = NoiseLocationActor;
-		SetFocus(LastNoiseLocationActor);
-		GetWorldTimerManager().SetTimer(StopLookingAtNoiseLocationTimerHandle, this, &ASolderAiBase::ForgetAboutNoise, 10.f);
+		if (GetBlackboardComponent() != nullptr)
+		{
+			GetBlackboardComponent()->SetValueAsVector(LastSeenLocationFieldName, LastSeenLocation);
+		}		
+		if (NoiseLocationActor != nullptr)
+		{
+			LastNoiseLocationActor = NoiseLocationActor;
+			SetFocus(LastNoiseLocationActor);
+			GetWorldTimerManager().SetTimer(StopLookingAtNoiseLocationTimerHandle, this, &ASolderAiBase::ForgetAboutNoise, 10.f);
+		}
 	}
 }
 
