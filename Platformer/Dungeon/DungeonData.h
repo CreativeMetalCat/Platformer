@@ -18,5 +18,8 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
         bool bCompleted = false;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+        bool bEnabled = false;
+
     static FDungeonRoomData CreateRoomData() { return  FDungeonRoomData(); }//placehodler, new parametrs will be added as project goes
 };

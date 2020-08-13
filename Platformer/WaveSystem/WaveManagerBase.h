@@ -42,6 +42,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool WaveIsDone = false;
 
+	//tag that will be given to all solders
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FName LevelTag;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = true))
 		EGameModes Gamemode = EGameModes::EGM_Defaut;
 

@@ -17,4 +17,29 @@ class PLATFORMER_API ADungeonLevelScriptActorBase : public ALevelScriptActor
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
         int RoomId = 0;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+        bool bEnabled = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+        FName LevelTag;
+
+    UFUNCTION(BlueprintCallable)
+        void SaveRoomState();
+
+    UFUNCTION(BlueprintCallable)
+        void DisableAllActorsInLevel();
+
+    UFUNCTION(BlueprintCallable)
+        void EnableAllActorsInLevel();
+
+    UFUNCTION(BlueprintCallable)
+        void SetLevelTag(FName tag);
+
+    UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+        void SetIsEnabled(bool Enabled);
+
+    void SetIsEnabled_Implementation(bool Enabled);
+
+
 };

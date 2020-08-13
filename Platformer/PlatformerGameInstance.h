@@ -24,4 +24,10 @@ public:
     UFUNCTION(BlueprintCallable)
         void MarkRoomAsCompleted(int RoomId);
 
+    UFUNCTION(BlueprintCallable)
+        void MarkRoomAsEnabled(bool Enabled, int roomId);
+
+    UFUNCTION(BlueprintPure)
+        bool GetIsRoomEnabled(int RoomId);
+
 };
