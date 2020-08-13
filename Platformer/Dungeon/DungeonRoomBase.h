@@ -62,6 +62,8 @@ public:
 	UFUNCTION(BlueprintPure)
 		float GetRoomLenght() { return  RoomLenght; }
 
+
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		void GenerateWalls();
 

@@ -25,14 +25,10 @@ void ADungeonLevelScriptActorBase::DisableAllActorsInLevel()
 		{
 			for (int i = 0; i < LevelActors.Num(); i++)
 			{
-				if (!LevelActors[i]->IsHidden())
-				{
-					LevelActors[i]->SetHidden(true);
-				}
-				if (!LevelActors[i]->IsActorTickEnabled())
-				{
-					LevelActors[i]->SetActorTickEnabled(false);
-				}
+				LevelActors[i]->SetActorHiddenInGame(true);
+
+				LevelActors[i]->SetActorTickEnabled(false);
+				
 				LevelActors[i]->SetActorEnableCollision(false);
 			}
 		}
@@ -49,14 +45,8 @@ void ADungeonLevelScriptActorBase::EnableAllActorsInLevel()
 		{
 			for (int i = 0; i < LevelActors.Num(); i++)
 			{
-				if (!LevelActors[i]->IsHidden())
-				{
-					LevelActors[i]->SetHidden(false);
-				}
-				if (!LevelActors[i]->IsActorTickEnabled())
-				{
-					LevelActors[i]->SetActorTickEnabled(true);
-				}
+				LevelActors[i]->SetActorHiddenInGame(false);
+				LevelActors[i]->SetActorTickEnabled(true);
 				LevelActors[i]->SetActorEnableCollision(true);
 			}
 		}

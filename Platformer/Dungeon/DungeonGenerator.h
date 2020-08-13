@@ -26,6 +26,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	FTimerHandle StreamedLevelInitTimer;
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UBillboardComponent* EditorBillboard;
@@ -85,5 +86,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void Generate();
+
+	UFUNCTION(BlueprintCallable)
+		void InitStreamedLevels();
 
 };

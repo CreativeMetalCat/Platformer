@@ -221,7 +221,7 @@ void ADungeonGenerator::Generate()
 				ADungeonRoomBase* room = GetWorld()->SpawnActor<ADungeonRoomBase>(CorridorClasses[0], FVector(StartingPoint.X, StartingPoint.Y + Cells[i].Location.X * (CorridorLenght + RoomLenght) * -1, StartingPoint.Z + Cells[i].Location.Y * MinHeightBetweenRooms * -1), FRotator::ZeroRotator);
 				if (room != nullptr)
 				{
-					GEngine->AddOnScreenDebugMessage(-1, 60.f, FColor::Red, "X for " + FString::FromInt(i) + " is " + FString::FromInt(Cells[i].Location.X));
+					//GEngine->AddOnScreenDebugMessage(-1, 60.f, FColor::Red, "X for " + FString::FromInt(i) + " is " + FString::FromInt(Cells[i].Location.X));
 					//GEngine->AddOnScreenDebugMessage(-1, 60.f, FColor::Red, "Y for " + FString::FromInt(i) + " is " + FString::FromInt(Cells[i].Location.Y));
 					room->HasDownWall = Cells[i].HasDownWall;
 					room->HasUpWall = Cells[i].HasUpWall;
@@ -247,22 +247,58 @@ void ADungeonGenerator::Generate()
 					bool success = false;
 					ULevelStreamingDynamic* level = ULevelStreamingKismet::LoadLevelInstance(GetWorld(), RoomLevelNames[id], FVector(StartingPoint.X, StartingPoint.Y + (Cells[i].Location.X * (CorridorLenght + RoomLenght) * -1) - CorridorLenght - RoomSpawnOffset, StartingPoint.Z + Cells[i].Location.Y * MinHeightBetweenRooms * -1), FRotator::ZeroRotator, success);
 
-					ADungeonLevelScriptActorBase* levelScript = Cast<ADungeonLevelScriptActorBase>(level->GetLevelScriptActor());//the reason why i love Unreal Engine
-					
+					if (success)
+					{
+						StreamedLevels.Add(level);
+					}
+					else
+					{
+						GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Error: Failed to load level: " + RoomLevelNames[id]);
+					}
+				}
+				
+
+			}
+
+		}
+		GetWorldTimerManager().SetTimer(StreamedLevelInitTimer, this, &ADungeonGenerator::InitStreamedLevels, 3.f, false);
+	}
+}
+
+
+void ADungeonGenerator::InitStreamedLevels()
+{
+	if (StreamedLevels.Num() > 0)
+	{
+		UPlatformerGameInstance* gameInstance = Cast<UPlatformerGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+		ADungeonLevelScriptActorBase* levelScript;
+		if (gameInstance != nullptr)
+		{
+			for (int i = 0; i < StreamedLevels.Num(); i++)
+			{
+				levelScript = nullptr;
+				if (StreamedLevels[i]->GetLevelScriptActor() != nullptr)
+				{
+					levelScript = Cast<ADungeonLevelScriptActorBase>(StreamedLevels[i]->GetLevelScriptActor());
+
 					if (levelScript != nullptr)
 					{
 						levelScript->RoomId = i;//level itself will deal with setting and checking everything else
+						levelScript->SetLevelTag(FName(FString::FromInt(i)));
+						levelScript->DisableAllActorsInLevel();//disabling from the beggining
 					}
-					UPlatformerGameInstance* gameInstance = Cast<UPlatformerGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-					if (gameInstance != nullptr)
+					else
 					{
-						gameInstance->Rooms.Add(FDungeonRoomData::CreateRoomData());//we add this struct for keeping data
+						//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Warning: Non ADungeonLevelScriptActorBase level was spawned, performance and save issues might occur. Current class " + level->GetLevelScriptActor()->GetClass()->GetDisplayNameText().ToString());
 					}
-	
-					StreamedLevels.Add(level);
+					gameInstance->Rooms.Add(FDungeonRoomData::CreateRoomData());//we add this struct for keeping data			
 				}
-
+				else
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 60.f, FColor::Red, "Error:Failed to get levelScriptActor");
+				}
 			}
 		}
 	}
 }
+
