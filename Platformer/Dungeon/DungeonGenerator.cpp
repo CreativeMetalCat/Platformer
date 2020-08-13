@@ -4,6 +4,8 @@
 #include "DungeonGenerator.h"
 #include "Kismet/GameplayStatics.h"
 #include "DungeonLevelScriptActorBase.h"
+#include "Kismet/GameplayStatics.h"
+#include "Platformer/PlatformerGameInstance.h"
 #include "Engine.h"
 
 // Sets default values
@@ -34,28 +36,6 @@ void ADungeonGenerator::Generate()
 {
 	if (StartingPointActor != nullptr) { StartingPoint = StartingPointActor->GetActorLocation(); }
 
-	if (RoomLevelNames.Num() > 0)
-	{
-		TArray<int>RoomIds;
-		int prevId = -1;
-		for (int i = 0; i < RoomsYAmount; i++)
-		{
-			for (int u = 0; u < RoomsXAmount; u++)
-			{
-				int id = FMath::RandRange(0, RoomLevelNames.Num() - 1);
-				/*while (id == prevId || bNotUseRandomnessCheck)
-				{
-					id = FMath::RandRange(0, RoomLevelNames.Num() - 1);
-				}*/
-				prevId = id;
-				RoomIds.Add(id);//for now we just generate array of this things
-
-				//bool success = false;
-				//ULevelStreamingKismet::LoadLevelInstance(GetWorld(), RoomLevelNames[id], FVector(StartingPoint.X, StartingPoint.Y + u * MinDistanceBetweenRooms * -1, StartingPoint.Z + i * MinHeightBetweenRooms * -1), FRotator::ZeroRotator, success);
-			}
-		}
-
-	}
 	if (RoomLevelNames.Num() > 0)
 	{
 		TArray<FCellData>Cells;
@@ -272,6 +252,11 @@ void ADungeonGenerator::Generate()
 					if (levelScript != nullptr)
 					{
 						levelScript->RoomId = i;//level itself will deal with setting and checking everything else
+					}
+					UPlatformerGameInstance* gameInstance = Cast<UPlatformerGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+					if (gameInstance != nullptr)
+					{
+						gameInstance->Rooms.Add(FDungeonRoomData::CreateRoomData());//we add this struct for keeping data
 					}
 	
 					StreamedLevels.Add(level);

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/LevelScriptActor.h"
+#include "Platformer/PlatformerGameInstance.h"
 #include "DungeonLevelScriptActorBase.generated.h"
 
 /**
