@@ -41,5 +41,6 @@ public:
 
     void SetIsEnabled_Implementation(bool Enabled);
 
+    virtual void BeginPlay()override;
 
 };

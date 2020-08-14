@@ -284,7 +284,7 @@ void ADungeonGenerator::InitStreamedLevels()
 					if (levelScript != nullptr)
 					{
 						levelScript->RoomId = i;//level itself will deal with setting and checking everything else
-						levelScript->SetLevelTag(FName(FString::FromInt(i)));
+						//levelScript->SetLevelTag(FName(FString::FromInt(i)));
 						levelScript->DisableAllActorsInLevel();//disabling from the beggining
 					}
 					else

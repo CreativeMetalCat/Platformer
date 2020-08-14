@@ -28,6 +28,9 @@ protected:
 
 	FTimerHandle StreamedLevelInitTimer;
 public:
+
+	TArray<TArray<AActor*>>StreamedLevelsActors;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UBillboardComponent* EditorBillboard;
 
@@ -74,6 +77,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<TSubclassOf<ADungeonRoomBase>>CorridorClasses;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<ADungeonRoomBase*>Corridors;

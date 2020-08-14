@@ -15,6 +15,9 @@ class PLATFORMER_API UPlatformerGameInstance : public UPlatformGameInstance
 {
 	GENERATED_BODY()
 public:
+    //id used by Streamed levels. Only used during level generation
+    int CurrentSpawnedLevelId = 0;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite,SaveGame)
         TArray<FDungeonRoomData>Rooms;
 
