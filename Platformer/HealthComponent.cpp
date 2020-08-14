@@ -56,7 +56,10 @@ float UHealthComponent::AddHealth(float amount)
 	float temp = 0;
 	if (Health + amount > MaxHealth) { temp = Health + amount - MaxHealth; }
 	Health += amount;
-	ClampHealth();
+	if (bHasHealthLimit)
+	{
+		ClampHealth();
+	}
 
 	return temp;
 }

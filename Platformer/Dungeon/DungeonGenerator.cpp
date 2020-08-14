@@ -215,17 +215,18 @@ void ADungeonGenerator::Generate()
 
 		for (int i = 0; i < Cells.Num(); i++)
 		{
-			//FVector(StartingPoint.X, StartingPoint.Y + u * MinDistanceBetweenRooms * -1, StartingPoint.Z + i * MinHeightBetweenRooms * -1)
+			
 			if (CorridorClasses.Num() > 0)
 			{
 				ADungeonRoomBase* room = GetWorld()->SpawnActor<ADungeonRoomBase>(CorridorClasses[0], FVector(StartingPoint.X, StartingPoint.Y + Cells[i].Location.X * (CorridorLenght + RoomLenght) * -1, StartingPoint.Z + Cells[i].Location.Y * MinHeightBetweenRooms * -1), FRotator::ZeroRotator);
 				if (room != nullptr)
 				{
-					//GEngine->AddOnScreenDebugMessage(-1, 60.f, FColor::Red, "X for " + FString::FromInt(i) + " is " + FString::FromInt(Cells[i].Location.X));
-					//GEngine->AddOnScreenDebugMessage(-1, 60.f, FColor::Red, "Y for " + FString::FromInt(i) + " is " + FString::FromInt(Cells[i].Location.Y));
+
+					
 					room->HasDownWall = Cells[i].HasDownWall;
 					room->HasUpWall = Cells[i].HasUpWall;
-					room->HasRightWall = Cells[i].HasRightWall;
+					/*we do that because we want rooms to be always accesable. it's a test,so probably will be changed*/
+					room->HasRightWall = false; //Cells[i].HasRightWall;
 					room->HasLeftWall = (i != 0) ? Cells[i].HasLeftWall : false;//the first one always doesn't have left wall because it's entrance
 					room->bIsDeadEnd = Cells[i].DeadEnd;
 					room->IdOfDropEnd = Cells[i].idOfDropChild;
@@ -240,12 +241,12 @@ void ADungeonGenerator::Generate()
 					Corridors.Add(room);
 				}
 
-				if (RoomLevelNames.Num() > 0)
+				if ((i == Cells.Num() - 1) && EndRoomLevelNames.Num() > 0)
 				{
-					int id = FMath::RandRange(0, RoomLevelNames.Num() - 1);
+					int id = FMath::RandRange(0, EndRoomLevelNames.Num() - 1);
 
 					bool success = false;
-					ULevelStreamingDynamic* level = ULevelStreamingKismet::LoadLevelInstance(GetWorld(), RoomLevelNames[id], FVector(StartingPoint.X, StartingPoint.Y + (Cells[i].Location.X * (CorridorLenght + RoomLenght) * -1) - CorridorLenght - RoomSpawnOffset, StartingPoint.Z + Cells[i].Location.Y * MinHeightBetweenRooms * -1), FRotator::ZeroRotator, success);
+					ULevelStreamingDynamic* level = ULevelStreamingKismet::LoadLevelInstance(GetWorld(), EndRoomLevelNames[id], FVector(StartingPoint.X, StartingPoint.Y + (Cells[i].Location.X * (CorridorLenght + RoomLenght) * -1) - CorridorLenght - RoomSpawnOffset, StartingPoint.Z + Cells[i].Location.Y * MinHeightBetweenRooms * -1), FRotator::ZeroRotator, success);
 
 					if (success)
 					{
@@ -256,7 +257,25 @@ void ADungeonGenerator::Generate()
 						GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Error: Failed to load level: " + RoomLevelNames[id]);
 					}
 				}
-				
+				else
+				{
+					if (RoomLevelNames.Num() > 0)
+					{
+						int id = FMath::RandRange(0, RoomLevelNames.Num() - 1);
+
+						bool success = false;
+						ULevelStreamingDynamic* level = ULevelStreamingKismet::LoadLevelInstance(GetWorld(), RoomLevelNames[id], FVector(StartingPoint.X, StartingPoint.Y + (Cells[i].Location.X * (CorridorLenght + RoomLenght) * -1) - CorridorLenght - RoomSpawnOffset, StartingPoint.Z + Cells[i].Location.Y * MinHeightBetweenRooms * -1), FRotator::ZeroRotator, success);
+
+						if (success)
+						{
+							StreamedLevels.Add(level);
+						}
+						else
+						{
+							GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Error: Failed to load level: " + RoomLevelNames[id]);
+						}
+					}
+				}
 
 			}
 
@@ -289,7 +308,7 @@ void ADungeonGenerator::InitStreamedLevels()
 					}
 					else
 					{
-						//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Warning: Non ADungeonLevelScriptActorBase level was spawned, performance and save issues might occur. Current class " + level->GetLevelScriptActor()->GetClass()->GetDisplayNameText().ToString());
+						
 					}
 					gameInstance->Rooms.Add(FDungeonRoomData::CreateRoomData());//we add this struct for keeping data			
 				}

@@ -15,7 +15,8 @@ enum class EGameModes : uint8
     EGM_Defaut     UMETA(DisplayName = "Defaut"),
     EGM_InfiniteEnemies     UMETA(DisplayName = "InfiniteEnemies"),
     EGM_InfiniteWaves     UMETA(DisplayName = "InfiniteWaves"),
-    EGM_Money     UMETA(DisplayName = "Money")
+    EGM_Money     UMETA(DisplayName = "Money"),
+    EGM_Dungeon    UMETA(DisplayName = "Dungeon")
 };
 
 UENUM(BlueprintType)

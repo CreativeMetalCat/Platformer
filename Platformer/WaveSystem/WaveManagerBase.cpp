@@ -6,6 +6,7 @@
 #include "Platformer/HealthComponent.h"
 #include "Platformer/ScoreComponent.h"
 #include "Platformer/AI/SolderAiBase.h"
+#include "Platformer/PlatformerGameInstance.h"
 #include "Engine.h"
 
 //#define DEBUG
@@ -226,6 +227,20 @@ bool AWaveManagerBase::ShouldSpawn(TArray<int> Indicies,int& TotalCount,int&arra
 int AWaveManagerBase::GetHowManySoldersIsLeft()
 {
 	return TotalAmountToSpawn - AmountOfDeadSolders;
+}
+
+int AWaveManagerBase::GetTotalWaveCount()
+{
+	if (Gamemode == EGameModes::EGM_Dungeon)
+	{
+		UPlatformerGameInstance* gameInstance = Cast<UPlatformerGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+		if (gameInstance != nullptr)
+		{
+			return gameInstance->TotalRoomsCompleted;
+		}
+	}
+
+	return TotalWaveCount;
 }
 
 void AWaveManagerBase::StartWave(int NewWaveId)

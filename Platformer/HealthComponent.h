@@ -45,6 +45,10 @@ public:
 		/*returns amount of health that didn't get added due to max health*/
 		float AddHealth(float amount);
 
+	/*if false MaxHealth will be ignored*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bHasHealthLimit = true;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float Health=0;
 

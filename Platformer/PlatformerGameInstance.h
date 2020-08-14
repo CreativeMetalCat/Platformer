@@ -21,6 +21,10 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite,SaveGame)
         TArray<FDungeonRoomData>Rooms;
 
+    //with each completed room enemies get a little bit stronger
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
+        int TotalRoomsCompleted = 0;
+
     UFUNCTION(BlueprintPure)
         bool IsRoomCompleted(int RoomId);
 

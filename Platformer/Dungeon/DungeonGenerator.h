@@ -71,6 +71,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<FString>RoomLevelNames;
 
+	//Rooms used as goal for each dungeon
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<FString>EndRoomLevelNames;
+
 	//if true  no two similar maps will be spawned next to each other
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool bNotUseRandomnessCheck = false;

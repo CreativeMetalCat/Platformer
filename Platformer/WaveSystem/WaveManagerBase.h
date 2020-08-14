@@ -129,6 +129,10 @@ public:
 	UFUNCTION(BlueprintPure)
 		int GetHowManySoldersIsLeft();
 
+	//return total wave count for this assest or for entire dungeon, based on gamemod
+	UFUNCTION(BlueprintPure)
+		int GetTotalWaveCount();
+
 	UFUNCTION(BlueprintCallable)
 		void StartWave(int NewWaveId);
 
