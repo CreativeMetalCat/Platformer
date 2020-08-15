@@ -1,4 +1,9 @@
-Arena: Last Stand is small arcade shooter about fighting wave of enemies,
+
+# Guns'n'Dungeons 
+
+Guns and dungeons is a protoype of dungeon crawler that uses last stand as base
+
+# Arena: Last Stand is small arcade shooter about fighting wave of enemies
 
 Maps:
 
