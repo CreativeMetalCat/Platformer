@@ -215,14 +215,14 @@ void ADungeonGenerator::Generate()
 
 		for (int i = 0; i < Cells.Num(); i++)
 		{
-			
+
 			if (CorridorClasses.Num() > 0)
 			{
 				ADungeonRoomBase* room = GetWorld()->SpawnActor<ADungeonRoomBase>(CorridorClasses[0], FVector(StartingPoint.X, StartingPoint.Y + Cells[i].Location.X * (CorridorLenght + RoomLenght) * -1, StartingPoint.Z + Cells[i].Location.Y * MinHeightBetweenRooms * -1), FRotator::ZeroRotator);
 				if (room != nullptr)
 				{
 
-					
+
 					room->HasDownWall = Cells[i].HasDownWall;
 					room->HasUpWall = Cells[i].HasUpWall;
 					/*we do that because we want rooms to be always accesable. it's a test,so probably will be changed*/
@@ -254,12 +254,31 @@ void ADungeonGenerator::Generate()
 					}
 					else
 					{
-						GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Error: Failed to load level: " + RoomLevelNames[id]);
+						GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Error: Failed to load level: " + EndRoomLevelNames[id]);
 					}
 				}
 				else
 				{
-					if (RoomLevelNames.Num() > 0)
+					if (SpawnedShops < MaxShopsPerDungeon && ShopLevelNames.Num()>0)
+					{
+						if (FMath::RandBool())
+						{
+							int id = FMath::RandRange(0, ShopLevelNames.Num() - 1);
+
+							bool success = false;
+							ULevelStreamingDynamic* level = ULevelStreamingKismet::LoadLevelInstance(GetWorld(), ShopLevelNames[id], FVector(StartingPoint.X, StartingPoint.Y + (Cells[i].Location.X * (CorridorLenght + RoomLenght) * -1) - CorridorLenght - RoomSpawnOffset, StartingPoint.Z + Cells[i].Location.Y * MinHeightBetweenRooms * -1), FRotator::ZeroRotator, success);
+
+							if (success)
+							{
+								StreamedLevels.Add(level);
+							}
+							else
+							{
+								GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Error: Failed to load level: " + ShopLevelNames[id]);
+							}
+						}
+					}
+					else if (RoomLevelNames.Num() > 0)
 					{
 						int id = FMath::RandRange(0, RoomLevelNames.Num() - 1);
 
@@ -275,6 +294,7 @@ void ADungeonGenerator::Generate()
 							GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Error: Failed to load level: " + RoomLevelNames[id]);
 						}
 					}
+
 				}
 
 			}

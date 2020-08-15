@@ -29,6 +29,8 @@ protected:
 	FTimerHandle StreamedLevelInitTimer;
 public:
 
+	int SpawnedShops = 0;
+
 	TArray<TArray<AActor*>>StreamedLevelsActors;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -69,11 +71,18 @@ public:
 		AActor* StartingPointActor = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int MaxShopsPerDungeon = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<FString>RoomLevelNames;
 
 	//Rooms used as goal for each dungeon
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<FString>EndRoomLevelNames;
+
+	//Rooms that have shops
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<FString>ShopLevelNames;
 
 	//if true  no two similar maps will be spawned next to each other
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
