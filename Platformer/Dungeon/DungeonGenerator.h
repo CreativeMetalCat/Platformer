@@ -9,6 +9,8 @@
 #include "LevelData.h"
 #include "CellData.h"
 #include "Engine/LevelStreamingDynamic.h"
+#include "Platformer/PlatformerGameInstance.h"
+#include "RoomType.h"
 #include "DungeonGenerator.generated.h"
 
 
@@ -31,7 +33,12 @@ public:
 
 	int SpawnedShops = 0;
 
+	int SpawnedChests = 0;
+
 	TArray<TArray<AActor*>>StreamedLevelsActors;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UPlatformerGameInstance* gameInstance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UBillboardComponent* EditorBillboard;
@@ -74,6 +81,9 @@ public:
 		int MaxShopsPerDungeon = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int MaxChestsPerDungeon = 2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<FString>RoomLevelNames;
 
 	//Rooms used as goal for each dungeon
@@ -82,7 +92,7 @@ public:
 
 	//Rooms that have shops
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TArray<FString>ShopLevelNames;
+		TArray<FString>ItemLevelNames;
 
 	//if true  no two similar maps will be spawned next to each other
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -107,6 +117,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void InitStreamedLevels();
 
-	bool SpawnRoom(TArray<FString>LevelNames, int LocationX, int LocationY);
+	bool SpawnRoom(TArray<FString>LevelNames, int LocationX, int LocationY, ERoomType roomType);
 
 };

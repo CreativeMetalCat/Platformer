@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "Engine/LevelScriptActor.h"
 #include "Platformer/PlatformerGameInstance.h"
+#include "RoomType.h"
 #include "DungeonLevelScriptActorBase.generated.h"
+
 
 /**
  * 
@@ -24,6 +26,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
         FName LevelTag;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+        ERoomType RoomType = ERoomType::ERT_Default;
+
     UFUNCTION(BlueprintCallable)
         void SaveRoomState();
 
@@ -35,6 +40,11 @@ public:
 
     UFUNCTION(BlueprintCallable)
         void SetLevelTag(FName tag);
+
+    UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+        void Init();
+
+    void Init_Implementation() {}
 
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
         void SetIsEnabled(bool Enabled);

@@ -5,7 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "DungeonLevelScriptActorBase.h"
 #include "Kismet/GameplayStatics.h"
-#include "Platformer/PlatformerGameInstance.h"
+
 #include "Engine.h"
 
 // Sets default values
@@ -22,7 +22,7 @@ ADungeonGenerator::ADungeonGenerator()
 void ADungeonGenerator::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	gameInstance = Cast<UPlatformerGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 }
 
 // Called every frame
@@ -35,6 +35,7 @@ void ADungeonGenerator::Tick(float DeltaTime)
 void ADungeonGenerator::Generate()
 {
 	if (StartingPointActor != nullptr) { StartingPoint = StartingPointActor->GetActorLocation(); }
+
 
 	if (RoomLevelNames.Num() > 0)
 	{
@@ -243,20 +244,30 @@ void ADungeonGenerator::Generate()
 
 				if ((i == Cells.Num() - 1) && EndRoomLevelNames.Num() > 0)
 				{
-					SpawnRoom(EndRoomLevelNames, Cells[i].Location.X, Cells[i].Location.Y);
+					SpawnRoom(EndRoomLevelNames, Cells[i].Location.X, Cells[i].Location.Y, ERoomType::ERT_Default);
 				}
 
-				else if (SpawnedShops < MaxShopsPerDungeon && ShopLevelNames.Num()  > 0 && FMath::RandBool())
+				else if (SpawnedShops < MaxShopsPerDungeon && ItemLevelNames.Num()  > 0 && FMath::RandBool())
 				{
-					if (SpawnRoom(ShopLevelNames, Cells[i].Location.X, Cells[i].Location.Y))
+
+					if (SpawnRoom(ItemLevelNames, Cells[i].Location.X, Cells[i].Location.Y, ERoomType::ERT_Store))
 					{
 						SpawnedShops++;
 					}
 				}
+				else if (SpawnedChests < MaxChestsPerDungeon && ItemLevelNames.Num()  > 0 && FMath::RandBool())
+				{
+
+					if (SpawnRoom(ItemLevelNames, Cells[i].Location.X, Cells[i].Location.Y, ERoomType::ERT_Chest))
+					{
+						SpawnedChests++;
+					}
+				}
+
 
 				else if (RoomLevelNames.Num() > 0)
 				{
-					SpawnRoom(RoomLevelNames, Cells[i].Location.X, Cells[i].Location.Y);
+					SpawnRoom(RoomLevelNames, Cells[i].Location.X, Cells[i].Location.Y, ERoomType::ERT_Default);
 				}
 
 				else
@@ -275,7 +286,7 @@ void ADungeonGenerator::InitStreamedLevels()
 {
 	if (StreamedLevels.Num() > 0)
 	{
-		UPlatformerGameInstance* gameInstance = Cast<UPlatformerGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+		
 		ADungeonLevelScriptActorBase* levelScript;
 		if (gameInstance != nullptr)
 		{
@@ -291,12 +302,17 @@ void ADungeonGenerator::InitStreamedLevels()
 						levelScript->RoomId = i;//level itself will deal with setting and checking everything else
 						//levelScript->SetLevelTag(FName(FString::FromInt(i)));
 						levelScript->DisableAllActorsInLevel();//disabling from the beggining
+						if (gameInstance != nullptr)
+						{
+							levelScript->RoomType = gameInstance->Rooms[i].RoomType;
+						}
+						levelScript->Init();
 					}
 					else
 					{
 						
 					}
-					gameInstance->Rooms.Add(FDungeonRoomData::CreateRoomData());//we add this struct for keeping data			
+					//we add this struct for keeping data			
 				}
 				else
 				{
@@ -307,7 +323,7 @@ void ADungeonGenerator::InitStreamedLevels()
 	}
 }
 
-bool ADungeonGenerator::SpawnRoom(TArray<FString> LevelNames,int LocationX,int LocationY)
+bool ADungeonGenerator::SpawnRoom(TArray<FString> LevelNames,int LocationX,int LocationY,ERoomType roomType)
 {
 	if (LevelNames.Num() > 0)
 	{
@@ -318,6 +334,12 @@ bool ADungeonGenerator::SpawnRoom(TArray<FString> LevelNames,int LocationX,int L
 
 		if (success)
 		{
+			if (gameInstance != nullptr)
+			{
+				FDungeonRoomData data = FDungeonRoomData::CreateRoomData();
+				data.RoomType = roomType;
+				gameInstance->Rooms.Add(data);
+			}
 			StreamedLevels.Add(level);
 			return true;
 		}
