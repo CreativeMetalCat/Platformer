@@ -243,60 +243,26 @@ void ADungeonGenerator::Generate()
 
 				if ((i == Cells.Num() - 1) && EndRoomLevelNames.Num() > 0)
 				{
-					int id = FMath::RandRange(0, EndRoomLevelNames.Num() - 1);
+					SpawnRoom(EndRoomLevelNames, Cells[i].Location.X, Cells[i].Location.Y);
+				}
 
-					bool success = false;
-					ULevelStreamingDynamic* level = ULevelStreamingKismet::LoadLevelInstance(GetWorld(), EndRoomLevelNames[id], FVector(StartingPoint.X, StartingPoint.Y + (Cells[i].Location.X * (CorridorLenght + RoomLenght) * -1) - CorridorLenght - RoomSpawnOffset, StartingPoint.Z + Cells[i].Location.Y * MinHeightBetweenRooms * -1), FRotator::ZeroRotator, success);
-
-					if (success)
+				else if (SpawnedShops < MaxShopsPerDungeon && ShopLevelNames.Num()  > 0 && FMath::RandBool())
+				{
+					if (SpawnRoom(ShopLevelNames, Cells[i].Location.X, Cells[i].Location.Y))
 					{
-						StreamedLevels.Add(level);
-					}
-					else
-					{
-						GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Error: Failed to load level: " + EndRoomLevelNames[id]);
+						SpawnedShops++;
 					}
 				}
+
+				else if (RoomLevelNames.Num() > 0)
+				{
+					SpawnRoom(RoomLevelNames, Cells[i].Location.X, Cells[i].Location.Y);
+				}
+
 				else
 				{
-					if (SpawnedShops < MaxShopsPerDungeon && ShopLevelNames.Num()>0)
-					{
-						if (FMath::RandBool())
-						{
-							int id = FMath::RandRange(0, ShopLevelNames.Num() - 1);
-
-							bool success = false;
-							ULevelStreamingDynamic* level = ULevelStreamingKismet::LoadLevelInstance(GetWorld(), ShopLevelNames[id], FVector(StartingPoint.X, StartingPoint.Y + (Cells[i].Location.X * (CorridorLenght + RoomLenght) * -1) - CorridorLenght - RoomSpawnOffset, StartingPoint.Z + Cells[i].Location.Y * MinHeightBetweenRooms * -1), FRotator::ZeroRotator, success);
-
-							if (success)
-							{
-								StreamedLevels.Add(level);
-							}
-							else
-							{
-								GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Error: Failed to load level: " + ShopLevelNames[id]);
-							}
-						}
-					}
-					else if (RoomLevelNames.Num() > 0)
-					{
-						int id = FMath::RandRange(0, RoomLevelNames.Num() - 1);
-
-						bool success = false;
-						ULevelStreamingDynamic* level = ULevelStreamingKismet::LoadLevelInstance(GetWorld(), RoomLevelNames[id], FVector(StartingPoint.X, StartingPoint.Y + (Cells[i].Location.X * (CorridorLenght + RoomLenght) * -1) - CorridorLenght - RoomSpawnOffset, StartingPoint.Z + Cells[i].Location.Y * MinHeightBetweenRooms * -1), FRotator::ZeroRotator, success);
-
-						if (success)
-						{
-							StreamedLevels.Add(level);
-						}
-						else
-						{
-							GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Error: Failed to load level: " + RoomLevelNames[id]);
-						}
-					}
-
+					GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "WorldGen Error: No rooms to spawn!");
 				}
-
 			}
 
 		}
@@ -334,10 +300,33 @@ void ADungeonGenerator::InitStreamedLevels()
 				}
 				else
 				{
-					GEngine->AddOnScreenDebugMessage(-1, 60.f, FColor::Red, "Error:Failed to get levelScriptActor");
+					
 				}
 			}
 		}
 	}
+}
+
+bool ADungeonGenerator::SpawnRoom(TArray<FString> LevelNames,int LocationX,int LocationY)
+{
+	if (LevelNames.Num() > 0)
+	{
+		int id = FMath::RandRange(0, LevelNames.Num() - 1);
+
+		bool success = false;
+		ULevelStreamingDynamic* level = ULevelStreamingKismet::LoadLevelInstance(GetWorld(), LevelNames[id], FVector(StartingPoint.X, StartingPoint.Y + (LocationX * (CorridorLenght + RoomLenght) * -1) - CorridorLenght - RoomSpawnOffset, StartingPoint.Z + LocationY * MinHeightBetweenRooms * -1), FRotator::ZeroRotator, success);
+
+		if (success)
+		{
+			StreamedLevels.Add(level);
+			return true;
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "WorldGen Error: Failed to load level: " + LevelNames[id]);
+			return false;
+		}
+	}
+	return false;
 }
 

@@ -107,4 +107,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void InitStreamedLevels();
 
+	bool SpawnRoom(TArray<FString>LevelNames, int LocationX, int LocationY);
+
 };
