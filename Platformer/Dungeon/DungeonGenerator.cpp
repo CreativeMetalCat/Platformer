@@ -110,18 +110,6 @@ void ADungeonGenerator::Generate()
 
 				if (FCellData::IsCellVisited(Cells, FVector2D(CurrentPos.X + 1, CurrentPos.Y)) && FCellData::IsCellVisited(Cells, FVector2D(CurrentPos.X - 1, CurrentPos.Y)) && FCellData::IsCellVisited(Cells, FVector2D(CurrentPos.X, CurrentPos.Y + 1)) && FCellData::IsCellVisited(Cells, FVector2D(CurrentPos.X, CurrentPos.Y - 1)))
 				{
-					//for debug
-					bool RightCellVisitedOrBlocked = FCellData::IsCellVisited(Cells, FVector2D(CurrentPos.X + 1, CurrentPos.Y));
-					bool DownCellVisitedOrBlocked = FCellData::IsCellVisited(Cells, FVector2D(CurrentPos.X, CurrentPos.Y + 1));
-					bool LeftCellVisitedOrBlocked = FCellData::IsCellVisited(Cells, FVector2D(CurrentPos.X - 1, CurrentPos.Y));
-					bool UpperCellVisitedOrBlocked = FCellData::IsCellVisited(Cells, FVector2D(CurrentPos.X, CurrentPos.Y - 1));
-
-					int RightId = FCellData::GetCellIdInArray(Cells, FVector2D(CurrentPos.X + 1, CurrentPos.Y));
-					int LefttId = FCellData::GetCellIdInArray(Cells, FVector2D(CurrentPos.X - 1, CurrentPos.Y));
-					int UpId = FCellData::GetCellIdInArray(Cells, FVector2D(CurrentPos.X, CurrentPos.Y + 1));
-					int DownId = FCellData::GetCellIdInArray(Cells, FVector2D(CurrentPos.X, CurrentPos.Y - 1));
-					//for debug end
-
 					Cells[FCellData::GetCellIdInArray(Cells, CurrentPos)].DeadEnd = true;
 
 					notMadeMove = false;
@@ -247,7 +235,7 @@ void ADungeonGenerator::Generate()
 					SpawnRoom(EndRoomLevelNames, Cells[i].Location.X, Cells[i].Location.Y, ERoomType::ERT_Default);
 				}
 
-				else if (SpawnedShops < MaxShopsPerDungeon && ItemLevelNames.Num()  > 0 && FMath::RandBool())
+				else if (SpawnedShops < MaxShopsPerDungeon && ItemLevelNames.Num()  > 0 && FMath::RandRange(0, 100) < ChanceOfItemRoomSpawn + 10)//30% percent chance of getting it
 				{
 
 					if (SpawnRoom(ItemLevelNames, Cells[i].Location.X, Cells[i].Location.Y, ERoomType::ERT_Store))
@@ -255,7 +243,7 @@ void ADungeonGenerator::Generate()
 						SpawnedShops++;
 					}
 				}
-				else if (SpawnedChests < MaxChestsPerDungeon && ItemLevelNames.Num()  > 0 && FMath::RandBool())
+				else if (SpawnedChests < MaxChestsPerDungeon && ItemLevelNames.Num()  > 0 && FMath::RandRange(0, 100) < ChanceOfItemRoomSpawn + 5)//40% percent chance of getting it
 				{
 
 					if (SpawnRoom(ItemLevelNames, Cells[i].Location.X, Cells[i].Location.Y, ERoomType::ERT_Chest))

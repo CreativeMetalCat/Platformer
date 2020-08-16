@@ -83,6 +83,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int MaxChestsPerDungeon = 2;
 
+	/*Shops are ChanceOfItemRoomSpawn+5,Chests are ChanceOfItemRoomSpawn+10*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int  ChanceOfItemRoomSpawn = 30;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<FString>RoomLevelNames;
 
