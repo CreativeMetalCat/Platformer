@@ -7,6 +7,7 @@
 #include "Platformer/ScoreComponent.h"
 #include "Platformer/AI/SolderAiBase.h"
 #include "Platformer/PlatformerGameInstance.h"
+
 #include "Engine.h"
 
 //#define DEBUG
@@ -125,6 +126,16 @@ void AWaveManagerBase::Update()
 			OnWaveEnded.Broadcast(WaveId);
 			UpdateTimerHanlde.Invalidate();
 			ProccessEndOfWave();
+
+			UPlatformerGameInstance* gameInstance = Cast<UPlatformerGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+			if (gameInstance != nullptr)
+			{
+				if(gameInstance->Rooms.IsValidIndex(RoomId))
+				{
+					gameInstance->Rooms[RoomId].bCompleted = true;
+				}
+			}
+
 			WaveIsDone = true;
 			AmountOfSpawned = 0;
 			TotalAmountToSpawn = 0;

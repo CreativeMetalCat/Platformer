@@ -35,7 +35,10 @@ void ADungeonGenerator::Tick(float DeltaTime)
 void ADungeonGenerator::Generate()
 {
 	if (StartingPointActor != nullptr) { StartingPoint = StartingPointActor->GetActorLocation(); }
-
+	if (gameInstance != nullptr)
+	{
+		gameInstance->CurrentSpawnedLevelId = 0;
+	}
 
 	if (RoomLevelNames.Num() > 0)
 	{
@@ -226,6 +229,7 @@ void ADungeonGenerator::Generate()
 					{
 						room->DropStart = (Cells[i].idOfUpperParent == -1) ? nullptr : Corridors[Cells[i].idOfUpperParent];
 					}
+					room->RoomId = i;
 					room->GenerateWalls();
 
 					Corridors.Add(room);
@@ -305,7 +309,9 @@ void ADungeonGenerator::InitStreamedLevels()
 						if (gameInstance != nullptr)
 						{
 							levelScript->RoomType = gameInstance->Rooms[i].RoomType;
+
 						}
+						levelScript->SetLevelsOrderId(i);
 						levelScript->Init();
 					}
 					else
@@ -330,7 +336,8 @@ bool ADungeonGenerator::SpawnRoom(TArray<FString> LevelNames,int LocationX,int L
 		int id = FMath::RandRange(0, LevelNames.Num() - 1);
 
 		bool success = false;
-		ULevelStreamingDynamic* level = ULevelStreamingKismet::LoadLevelInstance(GetWorld(), LevelNames[id], FVector(StartingPoint.X, StartingPoint.Y + (LocationX * (CorridorLenght + RoomLenght) * -1) - CorridorLenght - RoomSpawnOffset, StartingPoint.Z + LocationY * MinHeightBetweenRooms * -1), FRotator::ZeroRotator, success);
+		FVector SpawnLocation = FVector(StartingPoint.X, StartingPoint.Y + (LocationX * (CorridorLenght + RoomLenght) * -1) - CorridorLenght - RoomSpawnOffset, StartingPoint.Z + LocationY * MinHeightBetweenRooms * -1);
+		ULevelStreamingDynamic* level = ULevelStreamingKismet::LoadLevelInstance(GetWorld(), LevelNames[id], SpawnLocation, FRotator::ZeroRotator, success);
 
 		if (success)
 		{
@@ -338,6 +345,7 @@ bool ADungeonGenerator::SpawnRoom(TArray<FString> LevelNames,int LocationX,int L
 			{
 				FDungeonRoomData data = FDungeonRoomData::CreateRoomData();
 				data.RoomType = roomType;
+				data.Location = SpawnLocation;
 				gameInstance->Rooms.Add(data);
 			}
 			StreamedLevels.Add(level);

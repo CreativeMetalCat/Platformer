@@ -18,6 +18,8 @@ void ADungeonRoomBase::BeginPlay()
 	
 }
 
+
+
 // Called every frame
 void ADungeonRoomBase::Tick(float DeltaTime)
 {

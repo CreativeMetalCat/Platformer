@@ -39,6 +39,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	//for dungeons
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int RoomId = -1;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool WaveIsDone = false;
 

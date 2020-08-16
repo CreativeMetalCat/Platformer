@@ -68,21 +68,38 @@ void ADungeonLevelScriptActorBase::SetLevelTag(FName tag)
 				{
 					LevelActors[i]->Tags.Remove(LevelTag);
 					LevelActors[i]->Tags.Add(tag);
+					if (Cast<AWaveManagerBase >(LevelActors[i]) != nullptr)
+					{
+						Cast<AWaveManagerBase>(LevelActors[i])->RoomId = RoomId;
+					}
 				}
 			}		
 			
 		}
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AWaveManagerBase::StaticClass(), LevelActors);
-		if (LevelActors.Num() > 0)
-		{
-			for (int i = 0; i < LevelActors.Num(); i++)
-			{
-				Cast<AWaveManagerBase>(LevelActors[i])->LevelTag = tag;//update tag that will be given to all solders
-			}
-		}
 	}
 	LevelTag = tag;
 	
+}
+
+void ADungeonLevelScriptActorBase::SetLevelsOrderId(int id)
+{
+	TArray<AActor*>LevelActors;
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), LevelTag, LevelActors);
+	if (LevelActors.Num() > 0)
+	{
+		for (int i = 0; i < LevelActors.Num(); i++)
+		{
+			if (Cast<AWaveManagerBase >(LevelActors[i]) != nullptr)
+			{
+				Cast<AWaveManagerBase>(LevelActors[i])->RoomId = id;
+
+			}
+		}
+	}
+}
+
+void ADungeonLevelScriptActorBase::Init_Implementation()
+{
 }
 
 void ADungeonLevelScriptActorBase::SetIsEnabled_Implementation(bool Enabled)
@@ -97,8 +114,11 @@ void  ADungeonLevelScriptActorBase::BeginPlay()
 	UPlatformerGameInstance* gameInstance = Cast<UPlatformerGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	if (gameInstance != nullptr)
 	{
+		RoomId = gameInstance->CurrentSpawnedLevelId;
 		SetLevelTag(FName(FString::FromInt(gameInstance->CurrentSpawnedLevelId)));
+
 		gameInstance->CurrentSpawnedLevelId += 1;
+
 	}
 	else
 	{

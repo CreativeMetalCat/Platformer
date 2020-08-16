@@ -21,9 +21,13 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		float RoomLenght = 1500.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		int RoomId = -1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		bool HasUpWall = true;

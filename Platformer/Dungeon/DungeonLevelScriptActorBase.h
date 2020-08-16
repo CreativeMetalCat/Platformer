@@ -17,6 +17,8 @@ class PLATFORMER_API ADungeonLevelScriptActorBase : public ALevelScriptActor
 {
 	GENERATED_BODY()
 public:
+
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
         int RoomId = 0;
 
@@ -41,10 +43,14 @@ public:
     UFUNCTION(BlueprintCallable)
         void SetLevelTag(FName tag);
 
+    //set id used by wave manager
+    UFUNCTION(BlueprintCallable)
+        void SetLevelsOrderId(int id);
+
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
         void Init();
 
-    void Init_Implementation() {}
+    void Init_Implementation();
 
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
         void SetIsEnabled(bool Enabled);

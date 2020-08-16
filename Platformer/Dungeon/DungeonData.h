@@ -23,6 +23,9 @@ public:
         bool bEnabled = false;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
+        FVector Location;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
         ERoomType RoomType = ERoomType::ERT_Default;
 
     static FDungeonRoomData CreateRoomData() { return  FDungeonRoomData(); }//placehodler, new parametrs will be added as project goes
