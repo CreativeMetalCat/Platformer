@@ -25,13 +25,18 @@ public:
 		bool HasDownWall = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool HasRightWall = true;
+		bool HasRightWall = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool HasLeftWall = true;
 
+	//used by WorldGen
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool Visited = false;
+
+	//Used by mini-map gen
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bVisitedByPlayer = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool DeadEnd = false;

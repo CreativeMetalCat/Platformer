@@ -8,7 +8,7 @@
 #include "DungeonData.generated.h"
 
 /**
- * 
+ * Struct used to store info anount specific room
  */
 USTRUCT(Blueprintable)
 struct FDungeonRoomData
@@ -26,4 +26,20 @@ public:
         ERoomType RoomType = ERoomType::ERT_Default;
 
     static FDungeonRoomData CreateRoomData() { return  FDungeonRoomData(); }//placehodler, new parametrs will be added as project goes
+};
+
+/*
+Stores info about whole dungeon(such horisontal and vertical size)
+*/
+USTRUCT(Blueprintable)
+struct FDungeonData
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+        int SizeX = 2;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+        int SizeY = 2;
 };

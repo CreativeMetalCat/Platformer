@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintPlatformLibrary.h"
 #include "Dungeon/DungeonData.h"
+#include "Dungeon/CellData.h"
 #include "PlatformerGameInstance.generated.h"
 
 /**
@@ -20,6 +21,13 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite,SaveGame)
         TArray<FDungeonRoomData>Rooms;
+
+    //for mini-map generation
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
+        TArray<FCellData>Corridors;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
+        FDungeonData DungeonData;
 
     //with each completed room enemies get a little bit stronger
     UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)

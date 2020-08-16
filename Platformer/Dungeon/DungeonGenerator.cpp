@@ -217,6 +217,7 @@ void ADungeonGenerator::Generate()
 					/*we do that because we want rooms to be always accesable. it's a test,so probably will be changed*/
 					room->HasRightWall = false; //Cells[i].HasRightWall;
 					room->HasLeftWall = (i != 0) ? Cells[i].HasLeftWall : false;//the first one always doesn't have left wall because it's entrance
+					if (i == 0) { Cells[i].HasLeftWall = false; }
 					room->bIsDeadEnd = Cells[i].DeadEnd;
 					room->IdOfDropEnd = Cells[i].idOfDropChild;
 					room->IdOfDropStart = Cells[i].idOfUpperParent;
@@ -264,6 +265,17 @@ void ADungeonGenerator::Generate()
 				}
 			}
 
+		}
+		if (gameInstance != nullptr)
+		{
+			gameInstance->Corridors = Cells;//for mini-map generation
+
+			//save important data abount dungeon -- start
+
+			gameInstance->DungeonData.SizeX = RoomsXAmount;
+			gameInstance->DungeonData.SizeY = RoomsYAmount;
+
+			//save important data abount dungeon -- end
 		}
 		GetWorldTimerManager().SetTimer(StreamedLevelInitTimer, this, &ADungeonGenerator::InitStreamedLevels, 3.f, false);
 	}
