@@ -38,6 +38,9 @@ void ADungeonGenerator::Generate()
 	if (gameInstance != nullptr)
 	{
 		gameInstance->CurrentSpawnedLevelId = 0;
+
+		RoomsXAmount = gameInstance->DungeonData.SizeX;
+		RoomsYAmount = gameInstance->DungeonData.SizeY;
 	}
 
 	if (RoomLevelNames.Num() > 0)
@@ -276,8 +279,7 @@ void ADungeonGenerator::Generate()
 
 			//save important data abount dungeon -- start
 
-			gameInstance->DungeonData.SizeX = RoomsXAmount;
-			gameInstance->DungeonData.SizeY = RoomsYAmount;
+			
 
 			//save important data abount dungeon -- end
 		}
@@ -304,8 +306,11 @@ void ADungeonGenerator::InitStreamedLevels()
 					if (levelScript != nullptr)
 					{
 						levelScript->RoomId = i;//level itself will deal with setting and checking everything else
-						//levelScript->SetLevelTag(FName(FString::FromInt(i)));
-						levelScript->DisableAllActorsInLevel();//disabling from the beggining
+						
+						if (i != 0)//first one is too close to properly react so we load it from the beggining
+						{
+							levelScript->DisableAllActorsInLevel();//disabling from the beggining
+						}
 						if (gameInstance != nullptr)
 						{
 							levelScript->RoomType = gameInstance->Rooms[i].RoomType;
