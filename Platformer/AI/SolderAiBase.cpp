@@ -110,6 +110,34 @@ void ASolderAiBase::ForceToSeeEnemy(AActor* enemy)
 	GetWorldTimerManager().PauseTimer(NewWanderPointSelectionTimer);
 }
 
+AActor* ASolderAiBase::GetPointToGoTo_Implementation()
+{
+	if (bPatrolling && PatrolSystem != nullptr)
+	{
+		return PatrolSystem->GetPointById(CurrentPointId);
+	}
+	else
+	{
+		return GetPointOfWandering();
+	}
+}
+
+void ASolderAiBase::OnReachedPointOfTravel()
+{
+	if (PatrolSystem != nullptr)
+	{
+		CurrentPointId++;
+		if (CurrentPointId >= PatrolSystem->GetAmountOfPoints())
+		{
+			CurrentPointId = 0;
+		}
+	}
+	if (GetBlackboardComponent() != nullptr)
+	{
+		GetBlackboardComponent()->SetValueAsObject(WanderingPointFieldName, GetPointToGoTo());
+	}
+}
+
 void ASolderAiBase::ReactToGunNoise(FVector Location, AActor* NoiseLocationActor)
 {
 	if (CurrentEnemy == nullptr)//we don't care about player shooting if we can see it

@@ -6,6 +6,7 @@
 #include "AIController.h"
 #include "Platformer/Human/PhysicsHumanBase.h"
 #include "BehaviorTree/BehaviorTreeTypes.h"
+#include "Platformer/AI/Patrol/PatrolSystemBase.h"
 #include "SolderAiBase.generated.h"
 
 /**
@@ -17,10 +18,10 @@ class PLATFORMER_API ASolderAiBase : public AAIController
 	GENERATED_BODY()
 
 protected:
-		/*this timer is paused when ai sees enemy*/
-		FTimerHandle NewWanderPointSelectionTimer;
+	/*this timer is paused when ai sees enemy*/
+	FTimerHandle NewWanderPointSelectionTimer;
 
-		FTimerHandle StopLookingAtNoiseLocationTimerHandle;
+	FTimerHandle StopLookingAtNoiseLocationTimerHandle;
 public:
 
 	/*IF ai can not reach WanderPoint in 20 this time new point will be selected*/
@@ -28,7 +29,7 @@ public:
 		float TimeBeforeGivingUpOnPoint = 20.f;
 
 	/*Default enemy class. Ususally Player class*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category = Enemy)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enemy)
 		TSubclassOf<APhysicsHumanBase> EnemyClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enemy)
@@ -48,11 +49,21 @@ public:
 		FVector LastSeenLocation;
 
 	/*Additional set of enemies*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category = Enemy)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enemy)
 		TArray<AActor*>Enemies;
 
+	//by default it's false and only changed by WaveManager that spawns it
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Patrolling)
+		bool bPatrolling = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Patrolling)
+		APatrolSystemBase* PatrolSystem;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Patrolling)
+		int CurrentPointId = 0;
+
 	/*Behaviour tree used by this ai. Defined in child bps*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= BehaviorTree)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BehaviorTree)
 		UBehaviorTree* BehaviorTree = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Blackboard)
@@ -75,8 +86,21 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void ForceToSeeEnemy(AActor* enemy);
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		AActor* GetPointToGoTo();
+
+	AActor* GetPointToGoTo_Implementation();
+
+	UFUNCTION(BlueprintCallable)
+		void OnReachedPointOfTravel();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		AActor* GetPointOfWandering();
+
+	AActor* GetPointOfWandering_Implementation() { return nullptr; }
+
 	UFUNCTION(BlueprintCallable)//NoiseLocationActor is ALastNoiseLocation
-		void ReactToGunNoise(FVector Location,AActor*NoiseLocationActor);
+		void ReactToGunNoise(FVector Location, AActor* NoiseLocationActor);
 
 	UFUNCTION(BlueprintCallable)
 		void ForgetAboutNoise();
