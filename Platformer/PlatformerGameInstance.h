@@ -29,6 +29,14 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
         FDungeonData DungeonData;
 
+    //-1 if player is not in any room
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
+        int PlayerCurrentRoomId = -1;
+
+    //-1 if player is not in any corridor
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
+        int PlayerCurrentCorridorId = -1;
+
     //with each completed room enemies get a little bit stronger
     UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
         int TotalRoomsCompleted = 0;

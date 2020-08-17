@@ -214,7 +214,7 @@ void ADungeonGenerator::Generate()
 				if (room != nullptr)
 				{
 
-
+					Cells[i].Id = i;
 					room->HasDownWall = Cells[i].HasDownWall;
 					room->HasUpWall = Cells[i].HasUpWall;
 					/*we do that because we want rooms to be always accesable. it's a test,so probably will be changed*/
@@ -237,13 +237,13 @@ void ADungeonGenerator::Generate()
 
 				if ((i == Cells.Num() - 1) && EndRoomLevelNames.Num() > 0)
 				{
-					SpawnRoom(EndRoomLevelNames, Cells[i].Location.X, Cells[i].Location.Y, ERoomType::ERT_Default);
+					SpawnRoom(EndRoomLevelNames, Cells[i].Location.X, Cells[i].Location.Y, ERoomType::ERT_Default,i);
 				}
 
 				else if (SpawnedShops < MaxShopsPerDungeon && ItemLevelNames.Num()  > 0 && FMath::RandRange(0, 100) < ChanceOfItemRoomSpawn + 10)//30% percent chance of getting it
 				{
 
-					if (SpawnRoom(ItemLevelNames, Cells[i].Location.X, Cells[i].Location.Y, ERoomType::ERT_Store))
+					if (SpawnRoom(ItemLevelNames, Cells[i].Location.X, Cells[i].Location.Y, ERoomType::ERT_Store,i))
 					{
 						SpawnedShops++;
 					}
@@ -251,7 +251,7 @@ void ADungeonGenerator::Generate()
 				else if (SpawnedChests < MaxChestsPerDungeon && ItemLevelNames.Num()  > 0 && FMath::RandRange(0, 100) < ChanceOfItemRoomSpawn + 5)//40% percent chance of getting it
 				{
 
-					if (SpawnRoom(ItemLevelNames, Cells[i].Location.X, Cells[i].Location.Y, ERoomType::ERT_Chest))
+					if (SpawnRoom(ItemLevelNames, Cells[i].Location.X, Cells[i].Location.Y, ERoomType::ERT_Chest,i))
 					{
 						SpawnedChests++;
 					}
@@ -260,7 +260,7 @@ void ADungeonGenerator::Generate()
 
 				else if (RoomLevelNames.Num() > 0)
 				{
-					SpawnRoom(RoomLevelNames, Cells[i].Location.X, Cells[i].Location.Y, ERoomType::ERT_Default);
+					SpawnRoom(RoomLevelNames, Cells[i].Location.X, Cells[i].Location.Y, ERoomType::ERT_Default,i);
 				}
 
 				else
@@ -329,7 +329,7 @@ void ADungeonGenerator::InitStreamedLevels()
 	}
 }
 
-bool ADungeonGenerator::SpawnRoom(TArray<FString> LevelNames,int LocationX,int LocationY,ERoomType roomType)
+bool ADungeonGenerator::SpawnRoom(TArray<FString> LevelNames,int LocationX,int LocationY,ERoomType roomType, int id)
 {
 	if (LevelNames.Num() > 0)
 	{
@@ -346,6 +346,7 @@ bool ADungeonGenerator::SpawnRoom(TArray<FString> LevelNames,int LocationX,int L
 				FDungeonRoomData data = FDungeonRoomData::CreateRoomData();
 				data.RoomType = roomType;
 				data.Location = SpawnLocation;
+				data.Id = id;
 				gameInstance->Rooms.Add(data);
 			}
 			StreamedLevels.Add(level);

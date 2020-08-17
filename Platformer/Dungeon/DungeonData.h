@@ -22,6 +22,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
         bool bEnabled = false;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+        int Id = -1;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
         FVector Location;
 

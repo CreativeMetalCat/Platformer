@@ -18,6 +18,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FVector2D Location;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		int Id = -1;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool HasUpWall = true;
 
