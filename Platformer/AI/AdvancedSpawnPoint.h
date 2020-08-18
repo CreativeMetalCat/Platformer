@@ -23,6 +23,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UBillboardComponent* EditorBillboard;
 
 	//patrol system that will be given to solder by wave manager
 	UPROPERTY(BlueprintReadWrite,EditAnywhere)

@@ -143,7 +143,7 @@ void AWaveManagerBase::Update()
 			TakenTime = 0;
 			AmountOfDeadSolders = 0;
 			TimeIsUpTimerHandle.Invalidate();
-
+			bCurrentlyIsWave = false;
 			if (bAutoNextWave) 
 			{
 				//so that we don't need to manually add this to each world, but still leave possibility for scripted events
@@ -178,30 +178,40 @@ void AWaveManagerBase::OnTimeIsUp()
 
 void AWaveManagerBase::StartNewWave()
 {
-	if (Gamemode == EGameModes::EGM_Money)
+	if (!bCurrentlyIsWave)
 	{
-		StartWave(WaveId + 1);
-		WaveId++;//it doesn't matter what wave id is used, because it will dynamicly generate wave loadout
-	}
-	else if (Gamemode == EGameModes::EGM_Defaut )
-	{
-		if (WaveIdIsValid(WaveId + 1))
+		if (Gamemode == EGameModes::EGM_Money)
 		{
 			StartWave(WaveId + 1);
-			WaveId++;
+			WaveId++; //it doesn't matter what wave id is used, because it will dynamicly generate wave loadout
 		}
-	}
-	else if (GetTotalAmountOfAvailableWaves() > 0 && Gamemode == EGameModes::EGM_InfiniteWaves)
-	{
-		int id = FMath::RandRange(0, GetTotalAmountOfAvailableWaves() - 1);
-		if (WaveIdIsValid(id))
+		else if (Gamemode == EGameModes::EGM_Defaut)
 		{
-			StartWave(id);
+			if (WaveIdIsValid(WaveId + 1))
+			{
+				StartWave(WaveId + 1);
+				WaveId++;
+			}
 		}
-	}
-	else if (Gamemode == EGameModes::EGM_InfiniteEnemies)
-	{
-		StartWave(0);
+		else if (GetTotalAmountOfAvailableWaves() > 0 && Gamemode == EGameModes::EGM_InfiniteWaves)
+		{
+			int id = FMath::RandRange(0, GetTotalAmountOfAvailableWaves() - 1);
+			if (WaveIdIsValid(id))
+			{
+				StartWave(id);
+			}
+		}
+		else if (Gamemode == EGameModes::EGM_InfiniteEnemies)
+		{
+			StartWave(0);
+		}
+
+		if (Gamemode == EGameModes::EGM_Dungeon)
+		{
+			OnNewWaveStarted();
+			StartWave(WaveId + 1);
+			WaveId++; //it doesn't matter what wave id is used, because it will dynamicly generate wave loadout
+		}
 	}
 }
 
@@ -259,6 +269,8 @@ void AWaveManagerBase::StartWave(int NewWaveId)
 	SpawnNewWaveActors(NewWaveId);
 	GetWorldTimerManager().SetTimer(UpdateTimerHanlde, this, &AWaveManagerBase::Update, 0.1f, true);
 	GetWorldTimerManager().SetTimer(TimeIsUpTimerHandle, this, &AWaveManagerBase::OnTimeIsUp, TimeBeforeTimeIsUp, false);
+	OnNewWaveStarted();
+	bCurrentlyIsWave = true;
 	WaveIsDone = false;
 }
 

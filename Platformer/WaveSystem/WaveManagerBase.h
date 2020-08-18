@@ -33,6 +33,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FTimerHandle TimeIsUpTimerHandle;
 
+	//used by dungeon mode
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bIsInFight = false;
+
 	UPROPERTY(BlueprintAssignable)
 		FOnWaveEnded OnWaveEnded;
 
@@ -117,6 +121,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int WaveId = -1;
+		
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bCurrentlyIsWave = false;
 
 	/*For the Endless modes*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -157,6 +164,12 @@ public:
 		void SpawnHuman(TSubclassOf<AActor>HumanClass);
 
 	void SpawnHuman_Implementation(TSubclassOf<AActor>HumanClass){}
+
+	//additional function needed for making code pretier
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		void OnNewWaveStarted();
+
+	void OnNewWaveStarted_Implementation() {}
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		AActor* GetPlayer();
