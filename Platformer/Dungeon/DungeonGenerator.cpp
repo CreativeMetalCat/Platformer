@@ -338,11 +338,11 @@ bool ADungeonGenerator::SpawnRoom(TArray<FString> LevelNames,int LocationX,int L
 {
 	if (LevelNames.Num() > 0)
 	{
-		int id = FMath::RandRange(0, LevelNames.Num() - 1);
+		int GenId = FMath::RandRange(0, LevelNames.Num() - 1);
 
 		bool success = false;
 		FVector SpawnLocation = FVector(StartingPoint.X, StartingPoint.Y + (LocationX * (CorridorLenght + RoomLenght) * -1) - CorridorLenght - RoomSpawnOffset, StartingPoint.Z + LocationY * MinHeightBetweenRooms * -1);
-		ULevelStreamingDynamic* level = ULevelStreamingKismet::LoadLevelInstance(GetWorld(), LevelNames[id], SpawnLocation, FRotator::ZeroRotator, success);
+		ULevelStreamingDynamic* level = ULevelStreamingKismet::LoadLevelInstance(GetWorld(), LevelNames[GenId], SpawnLocation, FRotator::ZeroRotator, success);
 
 		if (success)
 		{
@@ -359,7 +359,7 @@ bool ADungeonGenerator::SpawnRoom(TArray<FString> LevelNames,int LocationX,int L
 		}
 		else
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "WorldGen Error: Failed to load level: " + LevelNames[id]);
+			GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "WorldGen Error: Failed to load level: " + LevelNames[GenId]);
 			return false;
 		}
 	}

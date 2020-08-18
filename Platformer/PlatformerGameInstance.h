@@ -31,11 +31,11 @@ public:
 
     //-1 if player is not in any room
     UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
-        int PlayerCurrentRoomId = -1;
+        int PlayerCurrentRoomId = 0;
 
     //-1 if player is not in any corridor
     UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
-        int PlayerCurrentCorridorId = -1;
+        int PlayerCurrentCorridorId = 0;
 
     //with each completed room enemies get a little bit stronger
     UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)

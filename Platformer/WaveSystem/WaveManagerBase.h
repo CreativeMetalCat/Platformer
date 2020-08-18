@@ -43,8 +43,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int RoomId = -1;
 
+	//if Gamemode is Dungeon then on begin play some solders will spawn
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=Dungeon)
+	int InitialSpawnCount = 3;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool WaveIsDone = false;
+	bool WaveIsDone = false;
 
 	//tag that will be given to all solders
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
