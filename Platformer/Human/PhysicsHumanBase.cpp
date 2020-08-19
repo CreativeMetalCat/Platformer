@@ -44,6 +44,28 @@ bool APhysicsHumanBase::GetIsBoneOnTheHead(FName BoneName)
 	return false;
 }
 
+void APhysicsHumanBase::DisabledActorUpdate()
+{
+	SetActorLocation(LastPosition);
+}
+
+void APhysicsHumanBase::DisableActor_Implementation()
+{
+	LastPosition = GetActorLocation();
+	GetWorldTimerManager().SetTimer(DisabledActorUpdateTimerHandle,this,&APhysicsHumanBase::DisabledActorUpdate,0.1f,true);
+	SetActorTickEnabled(false);
+	SetActorEnableCollision(false);
+	SetActorHiddenInGame(true);
+}
+
+void APhysicsHumanBase::EnableActor_Implementation()
+{
+	GetWorldTimerManager().ClearTimer(DisabledActorUpdateTimerHandle);
+	SetActorTickEnabled(true);
+	SetActorEnableCollision(true);
+	SetActorHiddenInGame(false);
+}
+
 bool APhysicsHumanBase::CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation, int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor) const
 {
 

@@ -17,6 +17,7 @@ bool ASolderAiBase::UpdateAI(TArray<AActor*> VisibleActors)
 			if (CurrentEnemy != nullptr)
 			{
 				bHadEnemy = true;
+				bHasSeenEnemy = true;
 				bool bAlive = false;
 				auto HealthComp = CurrentEnemy->GetComponentByClass(UHealthComponent::StaticClass());
 				if (HealthComp != nullptr)
@@ -26,6 +27,7 @@ bool ASolderAiBase::UpdateAI(TArray<AActor*> VisibleActors)
 				if (VisibleActors.Find(CurrentEnemy) != -1 && bAlive)
 				{
 					bEnemyCanBeSeen = true;
+					bHasSeenEnemy = true;
 					LastSeenLocation = CurrentEnemy->GetActorLocation();
 					return true;
 				}
@@ -38,7 +40,8 @@ bool ASolderAiBase::UpdateAI(TArray<AActor*> VisibleActors)
 			{
 				for (int i = 0; i < VisibleActors.Num(); i++)
 				{
-					if (VisibleActors[i]->GetClass()->IsChildOf(EnemyClass) || VisibleActors[i]->GetClass() == EnemyClass)
+					if (VisibleActors[i]->GetClass()->IsChildOf(EnemyClass) || VisibleActors[i]->GetClass() ==
+						EnemyClass)
 					{
 						auto HealthComp = VisibleActors[i]->GetComponentByClass(UHealthComponent::StaticClass());
 						if (HealthComp != nullptr)
@@ -49,6 +52,11 @@ bool ASolderAiBase::UpdateAI(TArray<AActor*> VisibleActors)
 								CurrentEnemy = VisibleActors[i];
 								GetBlackboardComponent()->SetValueAsObject(TargetFieldName, VisibleActors[i]);
 								OnTargetFound();
+								if (!AlertTimerhandle.IsValid())
+								{
+									GetWorldTimerManager().SetTimer(AlertTimerhandle, this, &ASolderAiBase::OnAlert,AlertTime);
+								}
+								bHasSeenEnemy = true;
 								GetWorldTimerManager().PauseTimer(NewWanderPointSelectionTimer);
 								return true;
 							}
@@ -66,8 +74,11 @@ bool ASolderAiBase::UpdateAI(TArray<AActor*> VisibleActors)
 		}
 		else
 		{
-			RemoveTarget();
-			OnEnemyLost();
+			if (bHasSeenEnemy)
+			{
+				RemoveTarget();
+				OnEnemyLost();
+			}
 			return false;
 		}
 	}
@@ -94,6 +105,12 @@ void ASolderAiBase::RemoveTarget()
 	{
 		GetBlackboardComponent()->SetValueAsVector(LastSeenLocationFieldName, LastSeenLocation);
 	}
+
+	if (AlertTimerhandle.IsValid())
+	{
+		GetWorldTimerManager().ClearTimer(AlertTimerhandle);
+	}
+	if (bHasSeenEnemy) { bHasSeenEnemy = false; }
 	CurrentEnemy = nullptr;
 	GetBlackboardComponent()->ClearValue(TargetFieldName);
 	SetFocus(nullptr);

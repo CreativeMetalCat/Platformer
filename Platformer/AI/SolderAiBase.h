@@ -22,6 +22,8 @@ protected:
 	FTimerHandle NewWanderPointSelectionTimer;
 
 	FTimerHandle StopLookingAtNoiseLocationTimerHandle;
+
+	FTimerHandle AlertTimerhandle;
 public:
 
 	/*IF ai can not reach WanderPoint in 20 this time new point will be selected*/
@@ -33,7 +35,13 @@ public:
 		TSubclassOf<APhysicsHumanBase> EnemyClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enemy)
+		float AlertTime = 5.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enemy)
 		bool bCanAlwaysSeeEnemy = false;
+		
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enemy)
+	bool bHasSeenEnemy = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Noise)
 		AActor* LastNoiseLocationActor = nullptr;
@@ -116,6 +124,12 @@ public:
 		void OnEnemyLost();
 
 	virtual void OnEnemyLost_Implementation() {}
+
+	//when enemy is seen end delay passed
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void OnAlert();
+
+	void OnAlert_Implementation() {}
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		void SelectNewWanderPoint();

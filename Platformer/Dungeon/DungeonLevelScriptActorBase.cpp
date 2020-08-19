@@ -4,6 +4,7 @@
 #include "DungeonLevelScriptActorBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Platformer/WaveSystem/WaveManagerBase.h"
+#include "Platformer/Dungeon/DungeonSystemInterface.h"
 #include "Engine.h"
 
 void ADungeonLevelScriptActorBase::SaveRoomState()
@@ -31,6 +32,11 @@ void ADungeonLevelScriptActorBase::DisableAllActorsInLevel()
 				LevelActors[i]->SetActorTickEnabled(false);
 				
 				LevelActors[i]->SetActorEnableCollision(false);
+
+				if (LevelActors[i]->Implements<UDungeonSystemInterface>() || (Cast<IDungeonSystemInterface>(LevelActors[i]) != nullptr))
+				{
+					IDungeonSystemInterface::Execute_DisableActor(LevelActors[i]);
+				}
 			}
 		}
 	}
@@ -49,6 +55,10 @@ void ADungeonLevelScriptActorBase::EnableAllActorsInLevel()
 				LevelActors[i]->SetActorHiddenInGame(false);
 				LevelActors[i]->SetActorTickEnabled(true);
 				LevelActors[i]->SetActorEnableCollision(true);
+				if (LevelActors[i]->Implements<UDungeonSystemInterface>() || (Cast<IDungeonSystemInterface>(LevelActors[i]) != nullptr))
+				{
+					IDungeonSystemInterface::Execute_EnableActor(LevelActors[i]);
+				}
 			}
 		}
 	}
@@ -64,13 +74,14 @@ void ADungeonLevelScriptActorBase::SetLevelTag(FName tag)
 		{
 			for (int i = 0; i < LevelActors.Num(); i++)
 			{
-				if (LevelActors[i]->Tags.Find(LevelTag) != INDEX_NONE)//better be safe then sorry
+				if (LevelActors[i]->Tags.Find(LevelTag) != INDEX_NONE) //better be safe then sorry
 				{
 					LevelActors[i]->Tags.Remove(LevelTag);
 					LevelActors[i]->Tags.Add(tag);
-					if (Cast<AWaveManagerBase >(LevelActors[i]) != nullptr)
+					if (Cast<AWaveManagerBase>(LevelActors[i]) != nullptr)
 					{
 						Cast<AWaveManagerBase>(LevelActors[i])->RoomId = RoomId;
+						Cast<AWaveManagerBase>(LevelActors[i])->LevelTag = tag;
 					}
 				}
 			}		
@@ -92,7 +103,7 @@ void ADungeonLevelScriptActorBase::SetLevelsOrderId(int id)
 			if (Cast<AWaveManagerBase >(LevelActors[i]) != nullptr)
 			{
 				Cast<AWaveManagerBase>(LevelActors[i])->RoomId = id;
-
+				Cast<AWaveManagerBase>(LevelActors[i])->LevelTag = LevelTag;
 			}
 		}
 	}

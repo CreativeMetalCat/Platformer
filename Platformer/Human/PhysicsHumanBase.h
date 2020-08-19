@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Perception/AISightTargetInterface.h"
+#include "Platformer/Dungeon/DungeonSystemInterface.h"
 #include "PhysicsHumanBase.generated.h"
 
 UCLASS()
-class PLATFORMER_API APhysicsHumanBase : public ACharacter, public IAISightTargetInterface
+class PLATFORMER_API APhysicsHumanBase : public ACharacter, public IAISightTargetInterface,public IDungeonSystemInterface
 {
 	GENERATED_BODY()
 
@@ -20,6 +21,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	FTimerHandle DisabledActorUpdateTimerHandle;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -31,6 +33,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Bones)
 		TArray<FName>HeadBones;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Dungeon)
+	FVector LastPosition;
+
 	UFUNCTION(BlueprintPure)
 		bool GetIsBoneOnTheHead(FName BoneName);
 
@@ -41,7 +46,13 @@ public:
 
 	USkeletalMeshComponent* GetBodyMesh_Implementation()const { return GetMesh(); }
 
+	//tick function in low consumption mode
+	void DisabledActorUpdate();
+	
+	void DisableActor_Implementation() override;
 
+	void EnableActor_Implementation() override;
+	
 	virtual bool CanBeSeenFrom(
 		const FVector& ObserverLocation,
 		FVector& OutSeenLocation,
